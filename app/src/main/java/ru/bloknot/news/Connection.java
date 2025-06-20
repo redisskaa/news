@@ -3,12 +3,15 @@ package ru.bloknot.news;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.List;
 
 public class Connection {
     String url;
+    String query;
+
+    public Connection(String url, String query) {
+        this.url = url;
+        this.query = query;
+    }
 
     public Connection(String url) {
         this.url = url;
@@ -20,7 +23,7 @@ public class Connection {
 
                 Document doc = Jsoup.connect(url).get();
 
-                for (Element element1 : doc.select("ul.bigline>li>a.sys")) {
+                for (Element element1 : doc.select(query)) {
                     String text = element1.text();
                     System.out.println(text);
                 }
