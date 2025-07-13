@@ -1,6 +1,7 @@
 package ru.bloknot.news.adapters;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     private final List<CardNews> dataList;
     private final Context context;
 
+    private ConnectivityManager connectivityManager;
+
     public CustomAdapter(Context context, List<CardNews> dataList) {
         this.context = context;
         this.dataList = dataList;
@@ -40,9 +43,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         holder.category.setText(data.getCategory());
         holder.time.setText(data.getTime());
         holder.description.setText(data.getDescription());
-
-        Picasso.get().load(data.getImageUrl())
+        Picasso.get()
+                .load(data.getImageUrl())
+                .fit()
                 .into(holder.imageView);
+
     }
 
     @Override
