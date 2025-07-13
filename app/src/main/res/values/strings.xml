@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">news</string>
+    <string name="app_name">Новости Краснодара</string>
     <string name="image">image</string>
     <string name="todo">TODO</string>
-    <string name="textCategory">Политика</string>
-    <string name="textTitle">КПРФ официально выдвинула Александра Сафронова кандидатом в губернаторы Краснодарского края</string>
-    <string name="textTime">сегодня в 18:25</string>
+    <string name="textCategory">Загрузка…</string>
+    <string name="textTitle">Загрузка…</string>
+    <string name="textTime">Загрузка…</string>
 </resources>

@@ -1,9 +1,14 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme.News" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your light theme here. -->
-        <item name="colorPrimary">#1D48A8</item>
+
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <!-- Цвет ActionBar -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <!-- Цвет при нажатии -->
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!-- Цвет текста на ActionBar -->
+        <item name="android:textColorPrimary">@color/white</item>
     </style>
 
-    <style name="Theme.News" parent="Base.Theme.News" />
+
 </resources>
