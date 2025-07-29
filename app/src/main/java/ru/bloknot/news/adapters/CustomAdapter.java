@@ -1,7 +1,7 @@
 package ru.bloknot.news.adapters;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +16,12 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import ru.bloknot.news.R;
+import ru.bloknot.news.activity.FullActivity;
 import ru.bloknot.news.models.CardNews;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
     private final List<CardNews> dataList;
     private final Context context;
-
-    private ConnectivityManager connectivityManager;
 
     public CustomAdapter(Context context, List<CardNews> dataList) {
         this.context = context;
@@ -48,6 +47,17 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                 .fit()
                 .into(holder.imageView);
 
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int pos = holder.getAdapterPosition();
+                System.out.println("клик: " + pos);
+                Intent intent = new Intent(view.getContext(), FullActivity.class);
+                intent.putExtra("count", pos);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -58,14 +68,13 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView title, category, time, description;
         ImageView imageView;
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.titleText);
             category = itemView.findViewById(R.id.catText);
             time = itemView.findViewById(R.id.timeText);
             description = itemView.findViewById(R.id.descriptionText);
             imageView = itemView.findViewById(R.id.imageView);
-
         }
     }
 }

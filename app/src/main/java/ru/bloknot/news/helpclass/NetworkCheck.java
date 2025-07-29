@@ -1,4 +1,4 @@
-package ru.bloknot.news;
+package ru.bloknot.news.helpclass;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

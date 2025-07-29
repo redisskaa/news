@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Новости Краснодара</string>
-    <string name="image">image</string>
     <string name="todo">TODO</string>
     <string name="textCategory">Загрузка…</string>
     <string name="textTitle">Загрузка…</string>

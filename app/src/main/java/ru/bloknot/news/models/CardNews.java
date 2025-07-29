@@ -8,6 +8,7 @@ public class CardNews {
     String title;
     String time;
     String description;
+    String fullText;
     public CardNews(String imageViewUrl, String category, String title, String time, String description) {
         this.imageViewUrl = imageViewUrl;
         this.category = category;
@@ -15,6 +16,16 @@ public class CardNews {
         this.time = time;
         this.description = description;
         Log.i("MY_TAG1", "Конструктор с параметрами");
+    }
+
+    public CardNews(String imageViewUrl, String category, String title, String time, String description, String fullText) {
+        this.imageViewUrl = imageViewUrl;
+        this.category = category;
+        this.title = title;
+        this.time = time;
+        this.description = description;
+        this.fullText = fullText;
+        Log.i("MY_TAG1", "Конструктор с параметрами 2");
     }
 
     public void setImageView(String imageView) {
@@ -38,12 +49,6 @@ public class CardNews {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public CardNews(String title, String category, String time) {
-        this.title = title;
-        this.category = category;
-        this.time = time;
     }
 
     public CardNews() {
