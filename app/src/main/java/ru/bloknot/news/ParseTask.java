@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -81,13 +82,17 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
     protected void onPostExecute(List<CardNews> result) {
         super.onPostExecute(result);
 
-        if (dialog.isShowing()) {
-            dialog.dismiss();
-        }
-        adapter = new CustomAdapter(context, result);
-        recyclerView.setAdapter(adapter);
+        if (result == null || result.isEmpty()) {
+            Toast.makeText(context, "Ошибка загрузки, попробуйте позже", Toast.LENGTH_SHORT).show();
+        }else {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
 
-        System.out.println("onPostExecute: " + result);
+            adapter = new CustomAdapter(context, result);
+            recyclerView.setAdapter(adapter);
+            System.out.println("onPostExecute: " + result);
+        }
 
     }
 }

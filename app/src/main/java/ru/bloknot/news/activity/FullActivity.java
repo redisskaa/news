@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.bloknot.news.R;
+import ru.bloknot.news.helpclass.HtmlCleaner;
 
 public class FullActivity extends AppCompatActivity {
     private TextView textView;
@@ -37,6 +39,7 @@ public class FullActivity extends AppCompatActivity {
         new ParseTaskFull(this).execute(count);
     }
 
+
     @SuppressLint("StaticFieldLeak")
     public class ParseTaskFull extends AsyncTask<Integer, Void, List<String>> {
         private final List<String> list = new ArrayList<>();
@@ -44,6 +47,7 @@ public class FullActivity extends AppCompatActivity {
         @SuppressLint("StaticFieldLeak")
         private Context context;
         private String res;
+        private Document doc;
 
         public ParseTaskFull(Context context) {
             this.context = context;
@@ -66,8 +70,6 @@ public class FullActivity extends AppCompatActivity {
         @Override
         protected List<String> doInBackground(Integer... count) {
 
-            Document doc = null;
-
             try {
                 doc = Jsoup.connect("https://bloknot-krasnodar.ru/").get();
             } catch (IOException e) {
@@ -75,19 +77,18 @@ public class FullActivity extends AppCompatActivity {
             }
 
             doc.select("ul.bigline").select("a.sys").forEach(element -> {
-
-                System.out.println("---------------------------------------------");
                 String url_full_news = "https://bloknot-krasnodar.ru" + element.select("a").attr("href");
-                System.out.println("Ссылка на полную новость: " + url_full_news);
-                System.out.println("---------------------------------------------");
 
                 try {
-                    Document document = Jsoup.connect(url_full_news).get();
-                    res = document.select("div.news-text").text();
+                    doc = Jsoup.connect(url_full_news).get();
+                    res = doc.select("div.news-text").html();
                     System.out.println("Получение полной новости: " + res);
-                    list.add(res);
 
-                } catch (IOException e) {
+                    String cleanedHtml = HtmlCleaner.removeScripts(res);
+
+                    list.add(cleanedHtml);
+
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
 
@@ -105,7 +106,8 @@ public class FullActivity extends AppCompatActivity {
             super.onPostExecute(result);
             System.out.println("onPostExecute2: " + result);
             String res = result.get(0);
-            textView.setText(res);
+
+            textView.setText(Html.fromHtml(res, Html.FROM_HTML_MODE_LEGACY));
 
             if (dialog.isShowing()) {
                 dialog.dismiss();
