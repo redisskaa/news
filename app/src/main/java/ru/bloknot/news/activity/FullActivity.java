@@ -32,7 +32,6 @@ public class FullActivity extends AppCompatActivity {
         /// Виджеты
         textView = findViewById(R.id.fullText);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        ///
 
         int count = getIntent().getIntExtra("count", 0);
         System.out.println("count =" + count);
@@ -71,7 +70,7 @@ public class FullActivity extends AppCompatActivity {
         protected List<String> doInBackground(Integer... count) {
 
             try {
-                doc = Jsoup.connect("https://bloknot-krasnodar.ru/").get();
+                doc = Jsoup.connect("https://bloknot-krasnodar.ru/").timeout(2000).get();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -80,12 +79,15 @@ public class FullActivity extends AppCompatActivity {
                 String url_full_news = "https://bloknot-krasnodar.ru" + element.select("a").attr("href");
 
                 try {
+
                     doc = Jsoup.connect(url_full_news).get();
                     res = doc.select("div.news-text").html();
                     System.out.println("Получение полной новости: " + res);
 
-                    String cleanedHtml = HtmlCleaner.removeScripts(res);
+                    String string = element.append("img").attr("src");
+                    System.out.println("Ссылка на картинку: " + string);
 
+                    String cleanedHtml = HtmlCleaner.removeScripts(res);
                     list.add(cleanedHtml);
 
                 } catch (Exception e) {

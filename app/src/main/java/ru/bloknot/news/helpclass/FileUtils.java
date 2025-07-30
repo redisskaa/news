@@ -11,16 +11,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-public class FileUtils {
+public class FileUtils<T> {
     private static final String FILENAME = "data.txt";
     private static final String TAG = "FileUtils";
 
     // Метод для сохранения текста в файл
-    public static boolean saveText(Context context, String text) {
+    public boolean saveData (Context context, T savedata) {
         try (FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
              OutputStreamWriter osw = new OutputStreamWriter(fos)) {
-
-            osw.write(text);
+            osw.write(String.valueOf(savedata));
             return true;
         } catch (IOException e) {
             Log.e(TAG, "Ошибка при сохранении файла", e);

@@ -23,13 +23,16 @@ public class HtmlCleaner {
             // Удаление всех скриптов
             doc.select("script").remove();
 
+            // Удаление всех скриптов
+//            doc.select("img").remove();
+
             // Дополнительная очистка
             cleanUnsafeAttributes(doc);
 
             return doc.html();
         } catch (Exception e) {
-            e.printStackTrace();
-            return html; // Возвращаем исходный HTML при ошибке
+            System.out.println("Ошибка HtmlCleaner: " + e);
+            return html;
         }
     }
 

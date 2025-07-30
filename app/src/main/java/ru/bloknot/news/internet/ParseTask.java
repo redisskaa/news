@@ -1,4 +1,4 @@
-package ru.bloknot.news;
+package ru.bloknot.news.internet;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -53,7 +53,7 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
         List<CardNews> contentList = new ArrayList<>();
 
         try {
-            doc = Jsoup.connect("https://bloknot-krasnodar.ru/").get();
+            doc = Jsoup.connect("https://bloknot-krasnodar.ru/").timeout(5000).get();
 
             doc.select("ul.bigline>li").forEach(element -> {
                 String title = element.select("a.sys").text();
@@ -61,12 +61,6 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
                 String time = element.select("span.botinfo").text();
                 String description = element.getElementsByTag("p").text();
                 String url_image = "https:" + element.select("img").attr("src");
-
-//                System.out.println("title: " + title);
-//                System.out.println("category: " + category);
-//                System.out.println("description: " + description);
-//                System.out.println("url_image: " + url_image);
-//                System.out.println("time: " + time);
 
                 contentList.add(new CardNews(url_image, category, title, time, description));
 
@@ -83,12 +77,14 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
         super.onPostExecute(result);
 
         if (result == null || result.isEmpty()) {
-            Toast.makeText(context, "Ошибка загрузки, попробуйте позже", Toast.LENGTH_SHORT).show();
-        }else {
+
             if (dialog.isShowing()) {
                 dialog.dismiss();
+                Toast.makeText(context, "Ошибка загрузки, попробуйте позже", Toast.LENGTH_SHORT).show();
             }
 
+        }else {
+            dialog.dismiss();
             adapter = new CustomAdapter(context, result);
             recyclerView.setAdapter(adapter);
             System.out.println("onPostExecute: " + result);

@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.bloknot.news.ParseTask;
 import ru.bloknot.news.R;
 import ru.bloknot.news.adapters.CustomAdapter;
 import ru.bloknot.news.helpclass.NetworkCheck;
+import ru.bloknot.news.internet.ParseTask;
 import ru.bloknot.news.models.CardNews;
 
 public class MainActivity extends AppCompatActivity {

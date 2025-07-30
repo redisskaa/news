@@ -47,16 +47,12 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                 .fit()
                 .into(holder.imageView);
 
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int pos = holder.getAdapterPosition();
-                System.out.println("клик: " + pos);
-                Intent intent = new Intent(view.getContext(), FullActivity.class);
-                intent.putExtra("count", pos);
-                context.startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(view -> {
+            int pos = holder.getAdapterPosition();
+            System.out.println("клик: " + pos);
+            Intent intent = new Intent(view.getContext(), FullActivity.class);
+            intent.putExtra("count", pos);
+            view.getContext().startActivity(intent);
         });
     }
 
