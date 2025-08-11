@@ -33,11 +33,6 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
         this.recyclerView = recyclerView;
     }
 
-    public ParseTask (Context context, CustomAdapter adapter) {
-        this.context = context;
-        this.adapter = adapter;
-    }
-
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -53,7 +48,7 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
         List<CardNews> contentList = new ArrayList<>();
 
         try {
-            doc = Jsoup.connect("https://bloknot-krasnodar.ru/").timeout(5000).get();
+            doc = Jsoup.connect("https://bloknot-krasnodar.ru/").get();
 
             doc.select("ul.bigline>li").forEach(element -> {
                 String title = element.select("a.sys").text();

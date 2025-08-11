@@ -2,7 +2,6 @@ package ru.bloknot.news.helpclass;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 public class HtmlCleaner {
     /**
@@ -22,34 +21,12 @@ public class HtmlCleaner {
 
             // Удаление всех скриптов
             doc.select("script").remove();
-
-            // Удаление всех скриптов
-//            doc.select("img").remove();
-
-            // Дополнительная очистка
-            cleanUnsafeAttributes(doc);
+            doc.select("img").remove();
 
             return doc.html();
         } catch (Exception e) {
             System.out.println("Ошибка HtmlCleaner: " + e);
             return html;
-        }
-    }
-
-    /**
-     * Метод для очистки небезопасных атрибутов
-     * @param doc Документ Jsoup
-     */
-    private static void cleanUnsafeAttributes(Document doc) {
-        // Перебираем все элементы
-        for (Element element : doc.getAllElements()) {
-            // Удаляем опасные атрибуты
-            element.removeAttr("onclick");
-            element.removeAttr("onmouseover");
-            element.removeAttr("onmouseout");
-            element.removeAttr("onkeypress");
-            element.removeAttr("onfocus");
-            element.removeAttr("onblur");
         }
     }
 }
