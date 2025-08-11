@@ -1,5 +1,6 @@
 package ru.bloknot.news.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -32,8 +33,15 @@ public class MainActivity extends AppCompatActivity {
 //        String savedText = FileUtils.loadText(this);
 //        System.out.println("savedText: " + savedText);
 
+        Intent intent = getIntent();
+        String data = intent.getStringExtra("cat");
+        ArrayList<String> list = intent.getStringArrayListExtra("list_url");
+        System.out.println("list: " + list);
+        System.out.println("data: " + data);
+
         if (NetworkCheck.isNetworkConnected(this)){
-            new ParseTask(this, customAdapter, recyclerView).execute();
+            assert list != null;
+            new ParseTask(this, customAdapter, recyclerView).execute(list.get(0));
             }else {
             finish();
             Toast.makeText(this, "Приложение не работает без интернета", Toast.LENGTH_LONG).show();

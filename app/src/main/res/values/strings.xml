@@ -4,4 +4,9 @@
     <string name="textCategory">Загрузка…</string>
     <string name="textTitle">Загрузка…</string>
     <string name="textTime">Загрузка…</string>
+    <string name="title_activity_list_category">ListCategory</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="loadingText">Загрузка..</string>
 </resources>

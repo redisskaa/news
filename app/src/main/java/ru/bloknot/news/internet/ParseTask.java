@@ -48,7 +48,7 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
         List<CardNews> contentList = new ArrayList<>();
 
         try {
-            doc = Jsoup.connect("https://bloknot-krasnodar.ru/").get();
+            doc = Jsoup.connect(params[0]).get();
 
             doc.select("ul.bigline>li").forEach(element -> {
                 String title = element.select("a.sys").text();
