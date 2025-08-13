@@ -10,20 +10,28 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 public class FileUtils<T> {
     private static final String FILENAME = "data.txt";
     private static final String TAG = "FileUtils";
 
     // Метод для сохранения текста в файл
-    public boolean saveData (Context context, T savedata) {
+    public void saveData (Context context, T savedata) {
         try (FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
              OutputStreamWriter osw = new OutputStreamWriter(fos)) {
             osw.write(String.valueOf(savedata));
-            return true;
         } catch (IOException e) {
             Log.e(TAG, "Ошибка при сохранении файла", e);
-            return false;
+        }
+    }
+
+    public void saveDataList (Context context, ArrayList<String> savedata) {
+        try (FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+             OutputStreamWriter osw = new OutputStreamWriter(fos)) {
+            osw.write(String.valueOf(savedata));
+        } catch (IOException e) {
+            Log.e(TAG, "Ошибка при сохранении файла", e);
         }
     }
 

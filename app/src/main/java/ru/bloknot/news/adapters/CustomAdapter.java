@@ -1,7 +1,6 @@
 package ru.bloknot.news.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import ru.bloknot.news.R;
-import ru.bloknot.news.activity.FullActivity;
 import ru.bloknot.news.models.CardNews;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
@@ -49,18 +47,22 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                 .error(R.drawable.error)
                 .into(holder.imageView);
 
-        holder.itemView.setOnClickListener(view -> {
-            int pos = holder.getAdapterPosition();
-            System.out.println("клик: " + pos);
-            Intent intent = new Intent(view.getContext(), FullActivity.class);
-            intent.putExtra("count", pos);
-            view.getContext().startActivity(intent);
-        });
+//        holder.itemView.setOnClickListener(view -> {
+//            int pos = holder.getAdapterPosition();
+//            System.out.println("клик: " + pos);
+//            Intent intent = new Intent(holder.itemView.getContext(), FullActivity.class);
+//            intent.putExtra("count", pos);
+//            view.getContext().startActivity(intent);
+//        });
     }
 
     @Override
     public int getItemCount() {
         return dataList.size();
+    }
+
+    public List<CardNews> getDataList() {
+        return dataList;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

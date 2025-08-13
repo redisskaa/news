@@ -1,11 +1,12 @@
 package ru.bloknot.news.ui.dashboard;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -32,51 +33,51 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
     private final String BASE_URL = "https://bloknot-krasnodar.ru";
     View root;
     ArrayList<String> listUrl;
+    ProgressDialog dialog;
+    Context context;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         root = binding.getRoot();
-
+        context = container.getContext();
         listView = root.findViewById(R.id.myListView);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Item item = (Item) parent.getItemAtPosition(position);
-                System.out.println("item: " + item);
-                Intent intent = new Intent(view.getContext(), MainActivity.class);
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Item item = (Item) parent.getItemAtPosition(position);
+            System.out.println("item: " + item);
+            Intent intent = new Intent(context, MainActivity.class);
 
-                switch (position) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 16:
-                    case 17:
-                    case 18:
-                    case 19:
-                    case 20:
-                        intent.putExtra("cat", item.getCategory());
-                        intent.putStringArrayListExtra("list_url", listUrl);
-                        startActivity(intent);
-                        break;
-                    default:
-                        System.out.println("Error");
-                        break;
-                }
+            switch (position) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                    intent.putExtra("cat", item.getCategory());
+                    intent.putStringArrayListExtra("list_url", listUrl);
+                    intent.putExtra("position", position);
+                    startActivity(intent);
+                    break;
+                default:
+                    System.out.println("Error");
+                    break;
             }
         });
 
@@ -94,6 +95,10 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
     @Override
     public void onPreExecute() {
         System.out.println("onPreExecute");
+        dialog = new ProgressDialog(context);
+        dialog.setCancelable(false);
+        dialog.setMessage("Загрузка данных...");
+        dialog.show();
     }
 
     @Override
@@ -115,7 +120,7 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             String url = BASE_URL + result.get(i).attr("href");
             listUrl.add(url);
         }
-
+        dialog.dismiss();
         System.out.println("this is ListUrls: " + listUrl);
     }
 

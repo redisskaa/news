@@ -18,7 +18,9 @@ import java.util.List;
 import ru.bloknot.news.adapters.CustomAdapter;
 import ru.bloknot.news.models.CardNews;
 
-/** @noinspection deprecation*/
+/**
+ * @noinspection deprecation
+ */
 @SuppressLint("StaticFieldLeak")
 public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
     private final Context context;
@@ -26,8 +28,9 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
     RecyclerView recyclerView;
     private ProgressDialog dialog;
     Document doc;
+    String cat = "";
 
-    public ParseTask (Context context, CustomAdapter adapter, RecyclerView recyclerView) {
+    public ParseTask(Context context, CustomAdapter adapter, RecyclerView recyclerView) {
         this.context = context;
         this.adapter = adapter;
         this.recyclerView = recyclerView;
@@ -46,20 +49,42 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
     protected List<CardNews> doInBackground(String... params) {
 
         List<CardNews> contentList = new ArrayList<>();
+        System.out.println("params " + params[0]);
 
         try {
             doc = Jsoup.connect(params[0]).get();
 
             doc.select("ul.bigline>li").forEach(element -> {
                 String title = element.select("a.sys").text();
-                String category = element.select("a.cat").text();
+                String cat = element.select("a.cat").text();
                 String time = element.select("span.botinfo").text();
                 String description = element.getElementsByTag("p").text();
                 String url_image = "https:" + element.select("img").attr("src");
-
-                contentList.add(new CardNews(url_image, category, title, time, description));
-
+                contentList.add(new CardNews(url_image, cat, title, time, description));
             });
+
+            String string = contentList.toString();
+
+            if (string.equals("[]")){
+
+                doc.select("div.news-section-header>h1").forEach(element -> {
+                    cat = element.text();
+                });
+
+                doc.select("div.catitem-row>div.catitem").forEach(element -> {
+                    String title = element.select("a.linksys").text();
+
+                    String time = element.select("span.botinfo").text();
+                    String description = element.select("span.previewtext").text();
+                    String url_image = "https:" + element.select("img").attr("src");
+
+                    contentList.add(new CardNews(url_image, cat, title, time, description));
+                });
+
+                adapter = new CustomAdapter(context, contentList);
+
+            }
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,7 +103,7 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
                 Toast.makeText(context, "Ошибка загрузки, попробуйте позже", Toast.LENGTH_SHORT).show();
             }
 
-        }else {
+        } else {
             dialog.dismiss();
             adapter = new CustomAdapter(context, result);
             recyclerView.setAdapter(adapter);
