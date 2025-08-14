@@ -7,6 +7,8 @@
     <string name="title_activity_list_category">ListCategory</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Категории</string>
+    <string name="title_dashboard2">Категории новостей</string>
     <string name="title_notifications">Notifications</string>
     <string name="loadingText">Загрузка..</string>
+    <string name="userAgent">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36</string>
 </resources>

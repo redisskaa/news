@@ -37,11 +37,10 @@ public class MainActivity extends AppCompatActivity{
 
         Intent intent = getIntent();
         category =  intent.getStringExtra("cat");
-        setTitle("Тематика: " + category);
+        setTitle("Тема >> " + category);
         int pos = intent.getIntExtra("position", 0);
         list = intent.getStringArrayListExtra("list_url");
-        System.out.println("list: " + list);
-        System.out.println("data: " + category);
+        assert list != null;
         String url = list.get(pos);
 
             if (NetworkCheck.isNetworkConnected(this)){

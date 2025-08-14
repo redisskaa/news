@@ -1,10 +1,6 @@
 package ru.bloknot.news.activity;
 
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
@@ -18,7 +14,6 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import ru.bloknot.news.R;
 import ru.bloknot.news.helpclass.HtmlCleaner;
@@ -44,13 +39,18 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
 
         if (list != null){
             String url = list.get(count);
-            new JsoupTask(this).execute(url, "a.sys");
+            new JsoupTask(this, this).execute(url, "a.sys");
         }else {
-            System.out.println("Error");
+            System.out.println("ErrorFull");
         }
 
 //        new ParseTaskFull(this).execute(count);
 
+    }
+
+    @Override
+    public void onProgressUpdate(Integer values) {
+        System.out.println("Загрузка full " + values);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
     @Override
     public void onPostExecute(Elements result) {
         String url_full_news = "https://bloknot-krasnodar.ru" + result.select("a").attr("href");
-        hreadStart(url_full_news, result);
+        hreadStart(url_full_news);
         System.out.println("JsoupTask: " + url_full_news);
     }
 
@@ -70,7 +70,7 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
         System.out.println("JsoupTask: " + e);
     }
 
-    public void hreadStart(String url, Elements elements){
+    public void hreadStart(String url){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -83,7 +83,8 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
                 }
 
                 String res = doc.select("div.news-text").html();
-                System.out.println("Получение полной новости: " + res);
+                String res1 = doc.select("div.news-text").text();
+                System.out.println("Получение полной новости: " + res1);
 
 //                String img_url = "https:" + doc.select("img").eq(0).attr("src");
 //                System.out.println("Ссылка на картинку: " + img_url);
@@ -94,86 +95,17 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        textView.setText(Html.fromHtml(cleanedHtml, Html.FROM_HTML_OPTION_USE_CSS_COLORS));
+                        if (cleanedHtml.isEmpty()){
+                            finish();
+                        }else {
+                            System.out.println("cccc: " + cleanedHtml);
+                            textView.setText(Html.fromHtml(cleanedHtml, Html.FROM_HTML_OPTION_USE_CSS_COLORS));
+                        }
+
                     }
                 });
             }
         }).start();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    public class ParseTaskFull extends AsyncTask<Integer, Void, String> {
-        private final List<String> list = new ArrayList<>();
-        private ProgressDialog dialog;
-        @SuppressLint("StaticFieldLeak")
-        private Context context;
-        private String res;
-        private Document doc;
-
-        public ParseTaskFull(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog = new ProgressDialog(context);
-            dialog.setCancelable(false);
-            dialog.setMessage("Загрузка данных...");
-            dialog.show();
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected String doInBackground(Integer... count) {
-
-            try {
-                doc = Jsoup.connect("https://bloknot-krasnodar.ru/auto/").get();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            doc.select("ul.bigline").select("a.sys").forEach(element -> {
-                String url_full_news = "https://bloknot-krasnodar.ru/" + element.select("a").attr("href");
-
-                try {
-
-                    doc = Jsoup.connect(url_full_news).get();
-                    res = doc.select("div.news-text").html();
-                    System.out.println("Получение полной новости: " + res);
-
-                    String string = element.append("img").attr("src");
-                    System.out.println("Ссылка на картинку: " + string);
-
-                    String cleanedHtml = HtmlCleaner.removeScripts(res);
-                    list.add(cleanedHtml);
-
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-
-            });
-
-            return list.get(count[0]);
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            System.out.println("onPostExecute2: " + result);
-
-
-            textView.setText(Html.fromHtml(result, Html.FROM_HTML_MODE_LEGACY));
-
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-
-        }
     }
 
 }

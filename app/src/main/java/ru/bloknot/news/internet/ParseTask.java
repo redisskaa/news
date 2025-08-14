@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.bloknot.news.R;
 import ru.bloknot.news.adapters.CustomAdapter;
 import ru.bloknot.news.models.CardNews;
 
@@ -39,10 +40,6 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        dialog = new ProgressDialog(context);
-        dialog.setCancelable(false);
-        dialog.setMessage("Загрузка данных...");
-        dialog.show();
     }
 
     @Override
@@ -52,7 +49,7 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
         System.out.println("params " + params[0]);
 
         try {
-            doc = Jsoup.connect(params[0]).get();
+            doc = Jsoup.connect(params[0]).userAgent(context.getResources().getString(R.string.userAgent)).get();
 
             doc.select("ul.bigline>li").forEach(element -> {
                 String title = element.select("a.sys").text();
@@ -67,11 +64,12 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
 
             if (string.equals("[]")){
 
-                doc.select("div.news-section-header>h1").forEach(element -> {
-                    cat = element.text();
-                });
-
                 doc.select("div.catitem-row>div.catitem").forEach(element -> {
+
+                    doc.select("div.news-section-header>h1").forEach(element1 -> {
+                        cat = element1.text();
+                    });
+
                     String title = element.select("a.linksys").text();
 
                     String time = element.select("span.botinfo").text();
@@ -80,8 +78,6 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
 
                     contentList.add(new CardNews(url_image, cat, title, time, description));
                 });
-
-                adapter = new CustomAdapter(context, contentList);
 
             }
 
@@ -97,14 +93,8 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
         super.onPostExecute(result);
 
         if (result == null || result.isEmpty()) {
-
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-                Toast.makeText(context, "Ошибка загрузки, попробуйте позже", Toast.LENGTH_SHORT).show();
-            }
-
+            Toast.makeText(context, "Ошибка загрузки, попробуйте позже", Toast.LENGTH_SHORT).show();
         } else {
-            dialog.dismiss();
             adapter = new CustomAdapter(context, result);
             recyclerView.setAdapter(adapter);
             System.out.println("onPostExecute: " + result);

@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ru.bloknot.news.R;
 import ru.bloknot.news.activity.MainActivity;
@@ -23,13 +23,12 @@ import ru.bloknot.news.adapters.ListViewAdapter;
 import ru.bloknot.news.databinding.FragmentDashboardBinding;
 import ru.bloknot.news.internet.JsoupParseCallback;
 import ru.bloknot.news.internet.JsoupTask;
-import ru.bloknot.news.models.Item;
 
 public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
     private FragmentDashboardBinding binding;
     ListView listView;
-    List<Item> data = new ArrayList<>();
+    ArrayList<String> data = new ArrayList<>();
     private final String BASE_URL = "https://bloknot-krasnodar.ru";
     View root;
     ArrayList<String> listUrl;
@@ -43,47 +42,37 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
         root = binding.getRoot();
         context = container.getContext();
         listView = root.findViewById(R.id.myListView);
+        new JsoupTask(this, context).execute(BASE_URL, "a.link_nav_second");
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            Item item = (Item) parent.getItemAtPosition(position);
-            System.out.println("item: " + item);
-            Intent intent = new Intent(context, MainActivity.class);
+            String itemValue = parent.getItemAtPosition(position).toString();
+            String pos = listUrl.get(position);
+            int posi = listUrl.indexOf(pos);
 
-            switch (position) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                    intent.putExtra("cat", item.getCategory());
-                    intent.putStringArrayListExtra("list_url", listUrl);
-                    intent.putExtra("position", position);
-                    startActivity(intent);
-                    break;
-                default:
-                    System.out.println("Error");
-                    break;
+            if (position == posi){
+                Intent intent = new Intent(context, MainActivity.class);
+                intent.putExtra("cat", itemValue);
+                intent.putStringArrayListExtra("list_url", listUrl);
+                intent.putExtra("position", position);
+                startActivity(intent);
+                Log.d("ListViewClick", "Position: " + posi + ", ID: " + id + ", Value: " + itemValue);
+            }else {
+                System.out.println("Error");
             }
+
         });
 
-        new JsoupTask(this).execute(BASE_URL, "a.link_nav_second");
-
         return root;
+    }
+
+    @Override
+    public void onProgressUpdate(Integer values) {
+        System.out.println("Загрузка " + values + " %");
+        dialog.setCancelable(false);
+        dialog.setMessage("Загрузка >> " + values + "%");
+        dialog.show();
+        if (values == 100){
+            dialog.dismiss();
+        }
     }
 
     @Override
@@ -94,11 +83,8 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
     @Override
     public void onPreExecute() {
-        System.out.println("onPreExecute");
         dialog = new ProgressDialog(context);
-        dialog.setCancelable(false);
-        dialog.setMessage("Загрузка данных...");
-        dialog.show();
+        System.out.println("onPreExecute");
     }
 
     @Override
@@ -108,19 +94,23 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
         ListViewAdapter adapter = new ListViewAdapter(getContext(), data);
         listView.setAdapter(adapter);
 
-        for (int i = 0; i < result.size(); i++) {
-            sb.append(result.get(i).text()).append("\n");
-            data.add(new Item(result.get(i).text()));
+
+        for (int b = 0; b < result.size(); b++) {
+            sb.append(result.get(b).text()).append("\n");
+            data.add(result.get(b).text());
         }
 
         listUrl = new ArrayList<>();
 
-        for (int i = 0; i < result.size(); i++) {
-            System.out.println(result.get(i).attr("href"));
-            String url = BASE_URL + result.get(i).attr("href");
+        for (int c = 0; c < result.size(); c++) {
+            String url = BASE_URL + result.get(c).attr("href");
             listUrl.add(url);
         }
-        dialog.dismiss();
+
+        for (int i = 0; i <= 100; i++) {
+            onProgressUpdate(i);
+        }
+
         System.out.println("this is ListUrls: " + listUrl);
     }
 

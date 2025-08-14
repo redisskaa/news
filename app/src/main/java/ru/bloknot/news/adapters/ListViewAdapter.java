@@ -7,18 +7,17 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import ru.bloknot.news.R;
-import ru.bloknot.news.models.Item;
 
 public class ListViewAdapter extends BaseAdapter {
 
     private Context context;
-    private List<Item> items;
+    private ArrayList<String> items;
     private LayoutInflater inflater;
 
-    public ListViewAdapter(Context context, List<Item> items) {
+    public ListViewAdapter(Context context, ArrayList<String> items) {
         this.context = context;
         this.items = items;
         this.inflater = LayoutInflater.from(context);
@@ -57,8 +56,8 @@ public class ListViewAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Item item = items.get(position);
-        holder.category.setText(item.getCategory());
+        String item = items.get(position);
+        holder.category.setText(item);
 
         return convertView;
     }
