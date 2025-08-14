@@ -20,7 +20,6 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
     @SuppressLint("StaticFieldLeak")
     Context context;
 
-
     public JsoupTask(JsoupParseCallback callback, Context context) {
         this.callback = callback;
         this.context = context;
@@ -28,12 +27,7 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
 
     @Override
     protected void onProgressUpdate(Integer... values) {
-        int progress = values.length > 0 ? values[0] : 0;
-        if (progress >= 0) { // нормальный ход загрузки
-            callback.onProgressUpdate(progress);
-        } else { // произошла ошибка
-            callback.onError(new Exception("Ошибка загрузки"));
-        }
+        callback.onProgressUpdate(values[0]);
     }
 
     @Override
@@ -48,6 +42,9 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
         String url = params[0];
         String cssQuery = params.length > 1 ? params[1] : "body"; // CSS-селектор для выборки элементов
 
+        for (int i = 0; i < 101; i++) {
+            publishProgress(i);
+        }
             try {
                 Document doc = Jsoup.connect(url).userAgent(context.getResources().getString(R.string.userAgent)).get();
                 return doc.select(cssQuery);

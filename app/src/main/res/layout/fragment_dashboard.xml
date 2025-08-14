@@ -4,8 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     tools:context=".ui.dashboard.DashboardFragment">
+
+
+    <ProgressBar
+        android:id="@+id/progBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:visibility="gone"
+        android:padding="150dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <ListView
         android:id="@+id/myListView"

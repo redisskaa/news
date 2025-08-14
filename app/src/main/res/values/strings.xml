@@ -5,7 +5,8 @@
     <string name="textTitle">Загрузка…</string>
     <string name="textTime">Загрузка…</string>
     <string name="title_activity_list_category">ListCategory</string>
-    <string name="title_home">Home</string>
+    <string name="title_home">Недавнее</string>
+    <string name="title_home2">Последние новости</string>
     <string name="title_dashboard">Категории</string>
     <string name="title_dashboard2">Категории новостей</string>
     <string name="title_notifications">Notifications</string>

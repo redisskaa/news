@@ -61,10 +61,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         return dataList.size();
     }
 
-    public List<CardNews> getDataList() {
-        return dataList;
-    }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView title, category, time, description;
         ImageView imageView;

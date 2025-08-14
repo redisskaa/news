@@ -32,28 +32,23 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
         /// Виджеты
         textView = findViewById(R.id.fullText);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        Intent intent = getIntent();
-        int count = intent.getIntExtra("count", 0);
-        System.out.println("count = " + count);
-        list = intent.getStringArrayListExtra("list_url");
-
-        if (list != null){
-            String url = list.get(count);
-            new JsoupTask(this, this).execute(url, "a.sys");
-        }else {
-            System.out.println("ErrorFull");
-        }
-
-//        new ParseTaskFull(this).execute(count);
-
+        startMethod();
     }
 
+    public void startMethod() {
+        Intent intent = getIntent();
+        String url = intent.getStringExtra("url");
+        System.out.println("url = " + url);
+        list = intent.getStringArrayListExtra("list_url");
+
+        new JsoupTask(this, this).execute(url, "a.sys");
+    }
 
     @Override
     public void onProgressUpdate(int percent) {
-        runOnUiThread(() -> {
-            System.out.println("Загрузка " + percent + " %");
-        });
+//        runOnUiThread(() -> {
+//            System.out.println("Загрузка " + percent + " %");
+//        });
     }
 
     @Override
@@ -73,7 +68,7 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
         System.out.println("JsoupTask: " + e);
     }
 
-    public void hreadStart(String url){
+    public void hreadStart(String url) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -93,20 +88,8 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
 //                System.out.println("Ссылка на картинку: " + img_url);
 
                 String cleanedHtml = HtmlCleaner.removeScripts(res);
-                list.add(cleanedHtml);
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (cleanedHtml.isEmpty()){
-                            finish();
-                        }else {
-                            System.out.println("cccc: " + cleanedHtml);
-                            textView.setText(Html.fromHtml(cleanedHtml, Html.FROM_HTML_OPTION_USE_CSS_COLORS));
-                        }
-
-                    }
-                });
+                runOnUiThread(() -> textView.setText(Html.fromHtml(cleanedHtml, Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH)));
             }
         }).start();
     }
