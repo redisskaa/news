@@ -65,13 +65,8 @@ public class ParseTask extends AsyncTask<String, Void, List<CardNews>> {
             if (string.equals("[]")){
 
                 doc.select("div.catitem-row>div.catitem").forEach(element -> {
-
-                    doc.select("div.news-section-header>h1").forEach(element1 -> {
-                        cat = element1.text();
-                    });
-
+                    cat = doc.select("div.news-section-header>h1").text();
                     String title = element.select("a.linksys").text();
-
                     String time = element.select("span.botinfo").text();
                     String description = element.select("span.previewtext").text();
                     String url_image = "https:" + element.select("img").attr("src");

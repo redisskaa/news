@@ -1,7 +1,6 @@
 package ru.bloknot.news.internet;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -18,7 +17,6 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
 
     private final JsoupParseCallback callback;
     private Exception error;
-    ProgressDialog dialog;
     @SuppressLint("StaticFieldLeak")
     Context context;
 
@@ -30,13 +28,17 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
 
     @Override
     protected void onProgressUpdate(Integer... values) {
-        super.onProgressUpdate(values);
+        int progress = values.length > 0 ? values[0] : 0;
+        if (progress >= 0) { // нормальный ход загрузки
+            callback.onProgressUpdate(progress);
+        } else { // произошла ошибка
+            callback.onError(new Exception("Ошибка загрузки"));
+        }
     }
 
     @Override
     protected void onPreExecute() {
         if (callback != null) {
-            dialog = new ProgressDialog(context);
             callback.onPreExecute();
         }
     }
@@ -46,24 +48,19 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
         String url = params[0];
         String cssQuery = params.length > 1 ? params[1] : "body"; // CSS-селектор для выборки элементов
 
-        for (int i = 0; i <= 100; i++) {
-            publishProgress(i);
             try {
                 Document doc = Jsoup.connect(url).userAgent(context.getResources().getString(R.string.userAgent)).get();
                 return doc.select(cssQuery);
             } catch (IOException e) {
                 error = e;
+                return null;
             }
-        }
-
-        return null;
     }
 
     @Override
     protected void onPostExecute(Elements elements) {
         if (callback != null) {
             if (elements != null) {
-                dialog.dismiss();
                 callback.onPostExecute(elements);
             } else {
                 callback.onError(error);

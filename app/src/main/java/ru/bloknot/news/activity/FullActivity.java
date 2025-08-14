@@ -48,9 +48,12 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
 
     }
 
+
     @Override
-    public void onProgressUpdate(Integer values) {
-        System.out.println("Загрузка full " + values);
+    public void onProgressUpdate(int percent) {
+        runOnUiThread(() -> {
+            System.out.println("Загрузка " + percent + " %");
+        });
     }
 
     @Override

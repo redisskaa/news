@@ -1,6 +1,5 @@
 package ru.bloknot.news.ui.dashboard;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,16 +27,15 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
     private FragmentDashboardBinding binding;
     ListView listView;
-    ArrayList<String> data = new ArrayList<>();
+    ArrayList<String> data;
     private final String BASE_URL = "https://bloknot-krasnodar.ru";
     View root;
     ArrayList<String> listUrl;
-    ProgressDialog dialog;
     Context context;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
+        data = new ArrayList<>();
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         context = container.getContext();
@@ -65,14 +63,8 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
     }
 
     @Override
-    public void onProgressUpdate(Integer values) {
+    public void onProgressUpdate(int values) {
         System.out.println("Загрузка " + values + " %");
-        dialog.setCancelable(false);
-        dialog.setMessage("Загрузка >> " + values + "%");
-        dialog.show();
-        if (values == 100){
-            dialog.dismiss();
-        }
     }
 
     @Override
@@ -83,17 +75,12 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
     @Override
     public void onPreExecute() {
-        dialog = new ProgressDialog(context);
         System.out.println("onPreExecute");
     }
 
     @Override
     public void onPostExecute(Elements result) {
         StringBuilder sb = new StringBuilder();
-
-        ListViewAdapter adapter = new ListViewAdapter(getContext(), data);
-        listView.setAdapter(adapter);
-
 
         for (int b = 0; b < result.size(); b++) {
             sb.append(result.get(b).text()).append("\n");
@@ -107,9 +94,8 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             listUrl.add(url);
         }
 
-        for (int i = 0; i <= 100; i++) {
-            onProgressUpdate(i);
-        }
+        ListViewAdapter adapter = new ListViewAdapter(getContext(), data);
+        listView.setAdapter(adapter);
 
         System.out.println("this is ListUrls: " + listUrl);
     }
