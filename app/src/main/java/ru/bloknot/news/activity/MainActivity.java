@@ -70,12 +70,12 @@ public class MainActivity extends AppCompatActivity {
 
                 System.out.println("position: " + position);
                 System.out.println("posi: " + posi);
-
+                String url = list.get(position);
+                System.out.println("Передал url: " + url);
                 if (position == posi) {
-                    String url = list.get(position);
                     Intent intent = new Intent(context, FullActivity.class);
-                    intent.putStringArrayListExtra("list_url", list);
                     intent.putExtra("url", url);
+                    intent.putExtra("position", posi);
                     startActivity(intent);
                 }
             }
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 adapter = new CustomAdapter(context, result);
                 recyclerView.setAdapter(adapter);
                 recView(context, result);
-                System.out.println("onPostExecute: " + result);
+//                System.out.println("onPostExecute: " + result);
             }
 
         }

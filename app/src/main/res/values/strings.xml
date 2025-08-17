@@ -12,4 +12,5 @@
     <string name="title_notifications">Notifications</string>
     <string name="loadingText">Загрузка..</string>
     <string name="userAgent">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36</string>
+    <string name="userAgentMobile">Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/86.0.4240.198 Mobile/15E148 Safari/604.1</string>
 </resources>

@@ -28,7 +28,7 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
     private FragmentDashboardBinding binding;
     private ListView listView;
-    private final String BASE_URL = "https://bloknot-krasnodar.ru";
+    private final String BASE_URL = "https://m.bloknot-krasnodar.ru";
     private ArrayList<String> listUrl;
     private ProgressBar progressBar;
 
@@ -65,6 +65,8 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
         System.out.println("onPreExecute");
         progressBar.setVisibility(View.VISIBLE);
     }
+
+
 
     @Override
     public void onPostExecute(Elements result) {

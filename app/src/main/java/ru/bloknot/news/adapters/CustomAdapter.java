@@ -29,7 +29,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.my_test, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_test, parent, false);
         return new ViewHolder(view);
     }
 
@@ -46,14 +46,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                 .placeholder(R.drawable.lazy)
                 .error(R.drawable.error)
                 .into(holder.imageView);
-
-//        holder.itemView.setOnClickListener(view -> {
-//            int pos = holder.getAdapterPosition();
-//            System.out.println("клик: " + pos);
-//            Intent intent = new Intent(holder.itemView.getContext(), FullActivity.class);
-//            intent.putExtra("count", pos);
-//            view.getContext().startActivity(intent);
-//        });
     }
 
     @Override
