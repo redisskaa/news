@@ -10,8 +10,6 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
-import ru.bloknot.news.R;
-
 /** @noinspection deprecation*/ // AsyncTask для парсинга HTML с помощью Jsoup
 public class JsoupTask extends AsyncTask<String, Integer, Elements> {
 
@@ -46,7 +44,9 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
             publishProgress(i);
         }
             try {
-                Document doc = Jsoup.connect(url).userAgent(context.getResources().getString(R.string.userAgent)).get();
+                Document doc = Jsoup.connect(url)
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36")
+                        .get();
                 return doc.select(cssQuery);
             } catch (IOException e) {
                 error = e;

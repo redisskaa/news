@@ -40,7 +40,6 @@ public class FullActivity extends AppCompatActivity implements JsoupParseCallbac
         String url = intent.getStringExtra("url");
         System.out.println("url = " + url);
         list = intent.getStringArrayListExtra("list_url");
-
         new JsoupTask(this, this).execute(url, "a.sys");
     }
 

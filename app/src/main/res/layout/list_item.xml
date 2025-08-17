@@ -8,11 +8,9 @@
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-condensed"
-        android:padding="10dp"
+        android:fontFamily="@font/comic"
+        android:padding="6dp"
         android:text="@string/loadingText"
-        android:textAllCaps="false"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textSize="15sp" />
 
 </LinearLayout>

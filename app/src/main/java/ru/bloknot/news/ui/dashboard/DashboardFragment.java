@@ -84,10 +84,63 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             listUrl.add(url);
         }
 
+//        System.out.println("\nСписок до удаления");
+//        System.out.println(data);
+//        System.out.println("\nСписок до удаления");
+//        System.out.println(listUrl);
+//        System.out.println("-----------------------");
+
+        int[] indicesToRemove = {2, 4, 7, 6, 15, 18};
+
+        deleteElementsByIndices(data, indicesToRemove);
+        deleteElementsByIndices(listUrl, indicesToRemove);
+
+//        System.out.println("\nСписок после удаления:");
+//        printArray(data);
+//        printArray(listUrl);
+
         ListViewAdapter adapter = new ListViewAdapter(getContext(), data);
+        adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
         progressBar.setVisibility(View.GONE);
     }
+
+    /**
+     * Метод для удаления элементов из ArrayList по списку индексов.
+     *
+     * @param arrayList   Список, из которого нужно удалить элементы.
+     * @param indices     Массив индексов элементов для удаления.
+     */
+    public static void deleteElementsByIndices(ArrayList<String> arrayList, int[] indices) {
+        // Сортируем индексы по убыванию, чтобы избежать смещения при удалении
+        for (int i = 0; i < indices.length; i++) {
+            for (int j = i + 1; j < indices.length; j++) {
+                if (indices[i] < indices[j]) {
+                    int temp = indices[i];
+                    indices[i] = indices[j];
+                    indices[j] = temp;
+                }
+            }
+        }
+
+        // Удаляем элементы по каждому индексу
+        for (int index : indices) {
+            if (index >= 0 && index < arrayList.size()) {
+                arrayList.remove(index);
+            }
+        }
+    }
+
+//    /**
+//     * Вспомогательный метод для вывода содержимого списка.
+//     *
+//     * @param arrayList Список для печати.
+//     */
+//    public static void printArray(ArrayList<String> arrayList) {
+//        for (String element : arrayList) {
+//            System.out.println(element);
+//        }
+//    }
 
     @Override
     public void onProgressUpdate(int percent) {

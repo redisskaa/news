@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     List<CardNews> arrayList;
     ArrayList<String> list;
     String category;
-    ArrayList<Integer> integers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         arrayList = new ArrayList<>();
         customAdapter = new CustomAdapter(this, arrayList);
         recyclerView.setAdapter(customAdapter);
-        integers = new ArrayList<>();
 
         Intent intent = getIntent();
         category = intent.getStringExtra("cat");
@@ -48,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         int pos = intent.getIntExtra("position", 0);
 
         list = intent.getStringArrayListExtra("list_url");
+
         assert list != null;
         String url = list.get(pos);
 
@@ -62,10 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void recView(Context context, List<CardNews> listObj) {
 
-        for (int i = 0; i < listObj.size(); i++) {
-            integers.add(i);
-        }
-
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -76,11 +71,8 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("position: " + position);
                 System.out.println("posi: " + posi);
 
-
-                String url = list.get(position);
-
-
                 if (position == posi) {
+                    String url = list.get(position);
                     Intent intent = new Intent(context, FullActivity.class);
                     intent.putStringArrayListExtra("list_url", list);
                     intent.putExtra("url", url);
