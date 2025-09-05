@@ -22,7 +22,6 @@ import androidx.annotation.NonNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
@@ -71,7 +70,6 @@ public class FullActivity extends Activity {
         settings.setUserAgentString(getResources().getString(R.string.user_agent));
         mWebView.setWebChromeClient(new MyWebChromeClient());
         mWebView.setWebViewClient(new MyWebViewClient());
-//        mWebView.loadUrl(url);
         downloadAndProcessHTML(url);
     }
 
@@ -153,15 +151,8 @@ public class FullActivity extends Activity {
     private void modifyAndLoadHTML(String htmlContent) {
         Document document = Jsoup.parse(htmlContent);
 
-        Elements links = document.select("a[href]");
-        int removedCount = 0;
-        for (Element link : links) {
-            link.remove(); // удаляем весь элемент целиком
-            removedCount++;
-        }
-
-        // Логируем количество удалённых ссылок
-        System.out.println("Количество удалённых ссылок: " + removedCount);
+        /// Удаляем все ссылки
+        document.select("a[href]").remove();
 
         // Удаляем меню верхнее полностью
         Element header = document.getElementById("header");

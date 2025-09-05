@@ -59,54 +59,57 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getFullNews(String url_cat, Context context) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Document doc = Jsoup.connect(url_cat).get();
-                    Elements elements = doc.select("ul.bigline>li>.thumbimage>a");
+        new Thread(() -> {
+            try {
+                Document doc = Jsoup.connect(url_cat).get();
+                Elements elements = doc.select("ul.bigline>li>.thumbimage>a");
 
-                    list_full_urls = new ArrayList<>();
+                list_full_urls = new ArrayList<>();
 
-                    /// Извлекаем все элементы <a> с атрибутом href
-                    Elements links = elements.select("a[href]");
+                /// Извлекаем все элементы <a> с атрибутом href
+                Elements links = elements.select("a[href]");
+                Elements elementsFull = doc.select("a.thumbimage[href]");
+                Elements elements1 = doc.select("div.structure-section>a.structure-section__item[href]");
+                Elements konkursy = doc.select(".last__item>a[href]");
 
-                    /// Если найдены элементы то выполняем действия дальше
-                    if (elements.is("a[href]")){
-
-                        // Проходим по всем найденным ссылкам и выводим их значения
-                        for (Element link : links) {
-                            list_full_urls.add(link.attr("abs:href"));
-                        }
-
-                        System.out.println("Выполнили 1 сценарий парсинга");
-
-                    }else {
-
-                        Elements elementsFull = doc.select("a.thumbimage[href]");
-
-                        for (Element link : elementsFull) {
-                            list_full_urls.add(link.attr("abs:href"));
-                        }
-
-                        System.out.println("Выполнили 2 сценарий парсинга");
+                /// Если найдены элементы то выполняем действия дальше
+                if (elements.is("a[href]")){
+                    // Проходим по всем найденным ссылкам и выводим их значения
+                    for (Element link : links) {
+                        list_full_urls.add(link.attr("abs:href"));
                     }
+                    System.out.println("Выполнили 1 сценарий парсинга");
 
-                    if (NetworkCheck.isNetworkConnected(context)) {
-                        new ParseTask(context, customAdapter, recyclerView).execute(url_cat);
-                    } else {
-                        finish();
-                        Toast.makeText(context, "Приложение не работает без интернета", Toast.LENGTH_LONG).show();
+                }else {
+                    for (Element link : elementsFull) {
+                        list_full_urls.add(link.attr("abs:href"));
                     }
-
-
-//                    runOnUiThread(() -> {
-//
-//                    });
-
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("Выполнили 2 сценарий парсинга");
                 }
+
+                if (elements1.is("div.structure-section>a.structure-section__item[href]")){
+                    for (Element link : elements1) {
+                        list_full_urls.add(link.attr("abs:href"));
+                    }
+                    System.out.println("Выполнили 3 сценарий парсинга");
+                }
+
+                if (konkursy.is(".last__item>a[href]")){
+                    for (Element link : konkursy) {
+                        list_full_urls.add(link.attr("abs:href"));
+                    }
+                    System.out.println("Выполнили 4 сценарий парсинга");
+                }
+
+                if (NetworkCheck.isNetworkConnected(context)) {
+                    new ParseTask(context, customAdapter, recyclerView).execute(url_cat);
+                } else {
+                    finish();
+                    Toast.makeText(context, "Приложение не работает без интернета", Toast.LENGTH_LONG).show();
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }).start();
     }
@@ -157,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<CardNews> result) {
             super.onPostExecute(result);
-
+            System.out.println(result);
             if (result == null || result.isEmpty()) {
                 Toast.makeText(context, "Ошибка загрузки, попробуйте позже", Toast.LENGTH_SHORT).show();
             } else {
@@ -213,7 +216,14 @@ public class MainActivity extends AppCompatActivity {
                         String description = element.select("span.previewtext").text();
                         String url_image = "https:" + element.select("img").attr("src");
 
-                        arrayList.add(new CardNews(url_image, cat, title, time, description));
+                        arrayList.add(new CardNews(url_image, category, title, time, description));
+                    });
+
+                    doc.select(".last__item>a").forEach(element -> {
+                        String time = "в разработке";
+                        String title = element.getElementsByClass("last__description").select("h3").text();
+                        String url_image = "https:" + element.select("img").attr("src");
+                        arrayList.add(new CardNews(url_image, category, title, time, time));
                     });
 
                 }

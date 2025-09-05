@@ -67,16 +67,12 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
         progressBar.setVisibility(View.VISIBLE);
     }
 
-
-
     @Override
     public void onPostExecute(Elements result) {
 
-        StringBuilder sb = new StringBuilder();
         ArrayList<String> data = new ArrayList<>();
 
         for (int b = 0; b < result.size(); b++) {
-//            sb.append(result.get(b).text()).append("\n");
             data.add(result.get(b).text());
         }
 
@@ -87,20 +83,14 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             listUrl.add(url);
         }
 
-//        System.out.println("\nСписок до удаления");
-//        System.out.println(data);
-//        System.out.println("\nСписок до удаления");
-//        System.out.println(listUrl);
-//        System.out.println("-----------------------");
+        listUrl.set(7, "https://bloknot-krasnodar.ru/news/officials_of_the_city/");
+        listUrl.set(10, "https://bloknot-krasnodar.ru/news/a_request_to_the_editor/");
+        listUrl.set(15, "https://bloknot-krasnodar.ru/structure/holiday_calendar/");
 
-        int[] indicesToRemove = {2, 4, 7, 15, 18};
+        int[] indicesToRemove = {4};
 
         deleteElementsByIndices(data, indicesToRemove);
         deleteElementsByIndices(listUrl, indicesToRemove);
-
-//        System.out.println("\nСписок после удаления:");
-//        printArray(data);
-//        printArray(listUrl);
 
         ListViewAdapter adapter = new ListViewAdapter(getContext(), data);
         adapter.notifyDataSetChanged();
