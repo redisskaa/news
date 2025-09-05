@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     CustomAdapter customAdapter;
     List<CardNews> arrayList;
     ArrayList<String> list;
+    ArrayList<String> list_full_urls;
     String category;
 
     @Override
@@ -40,26 +43,75 @@ public class MainActivity extends AppCompatActivity {
         customAdapter = new CustomAdapter(this, arrayList);
         recyclerView.setAdapter(customAdapter);
 
+        /// Передаем данные из интента DashboardFragment.java
         Intent intent = getIntent();
         category = intent.getStringExtra("cat");
         setTitle("Тема >> " + category);
         int pos = intent.getIntExtra("position", 0);
-
         list = intent.getStringArrayListExtra("list_url");
+
+        System.out.println("list url: " + list);
 
         assert list != null;
         String url = list.get(pos);
 
-        if (NetworkCheck.isNetworkConnected(this)) {
-            new ParseTask(this, customAdapter, recyclerView).execute(url);
-        } else {
-            finish();
-            Toast.makeText(this, "Приложение не работает без интернета", Toast.LENGTH_LONG).show();
-        }
-
+        getFullNews(url, this);
     }
 
-    public void recView(Context context, List<CardNews> listObj) {
+    public void getFullNews(String url_cat, Context context) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Document doc = Jsoup.connect(url_cat).get();
+                    Elements elements = doc.select("ul.bigline>li>.thumbimage>a");
+
+                    list_full_urls = new ArrayList<>();
+
+                    /// Извлекаем все элементы <a> с атрибутом href
+                    Elements links = elements.select("a[href]");
+
+                    /// Если найдены элементы то выполняем действия дальше
+                    if (elements.is("a[href]")){
+
+                        // Проходим по всем найденным ссылкам и выводим их значения
+                        for (Element link : links) {
+                            list_full_urls.add(link.attr("abs:href"));
+                        }
+
+                        System.out.println("Выполнили 1 сценарий парсинга");
+
+                    }else {
+
+                        Elements elementsFull = doc.select("a.thumbimage[href]");
+
+                        for (Element link : elementsFull) {
+                            list_full_urls.add(link.attr("abs:href"));
+                        }
+
+                        System.out.println("Выполнили 2 сценарий парсинга");
+                    }
+
+                    if (NetworkCheck.isNetworkConnected(context)) {
+                        new ParseTask(context, customAdapter, recyclerView).execute(url_cat);
+                    } else {
+                        finish();
+                        Toast.makeText(context, "Приложение не работает без интернета", Toast.LENGTH_LONG).show();
+                    }
+
+
+//                    runOnUiThread(() -> {
+//
+//                    });
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+    }
+
+    public void recView(Context context, List<CardNews> listObj) throws IndexOutOfBoundsException{
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
@@ -67,10 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
                 CardNews cardNews = listObj.get(position);
                 int posi = listObj.indexOf(cardNews);
-
-                System.out.println("position: " + position);
-                System.out.println("posi: " + posi);
-                String url = list.get(position);
+                String url = list_full_urls.get(position);
                 System.out.println("Передал url: " + url);
                 if (position == posi) {
                     Intent intent = new Intent(context, FullActivity.class);
@@ -142,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
 
             try {
 
-                doc = Jsoup.connect(params[0]).userAgent(context.getResources().getString(R.string.userAgent)).get();
+                doc = Jsoup.connect(params[0]).userAgent(context.getResources().getString(R.string.userAgentWindows)).get();
 
                 doc.select("ul.bigline>li").forEach(element -> {
                     String title = element.select("a.sys").text();

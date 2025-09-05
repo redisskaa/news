@@ -28,7 +28,7 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
     private FragmentDashboardBinding binding;
     private ListView listView;
-    private final String BASE_URL = "https://m.bloknot-krasnodar.ru";
+    private final String BASE_URL = "https://bloknot-krasnodar.ru";
     private ArrayList<String> listUrl;
     private ProgressBar progressBar;
 
@@ -48,6 +48,7 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             if (position == posi) {
                 Intent intent = new Intent(root.getContext(), MainActivity.class);
                 intent.putExtra("cat", itemValue);
+                intent.putExtra("BASE_URL", BASE_URL);
                 intent.putStringArrayListExtra("list_url", listUrl);
                 intent.putExtra("position", posi);
                 startActivity(intent);
@@ -75,14 +76,14 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
         ArrayList<String> data = new ArrayList<>();
 
         for (int b = 0; b < result.size(); b++) {
-            sb.append(result.get(b).text()).append("\n");
+//            sb.append(result.get(b).text()).append("\n");
             data.add(result.get(b).text());
         }
 
         listUrl = new ArrayList<>();
 
         for (int c = 0; c < result.size(); c++) {
-            String url = BASE_URL + result.get(c).attr("href");
+            String url = result.get(c).attr("abs:href");
             listUrl.add(url);
         }
 
@@ -92,7 +93,7 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 //        System.out.println(listUrl);
 //        System.out.println("-----------------------");
 
-        int[] indicesToRemove = {2, 4, 7, 6, 15, 18};
+        int[] indicesToRemove = {2, 4, 7, 15, 18};
 
         deleteElementsByIndices(data, indicesToRemove);
         deleteElementsByIndices(listUrl, indicesToRemove);
@@ -132,17 +133,6 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             }
         }
     }
-
-//    /**
-//     * Вспомогательный метод для вывода содержимого списка.
-//     *
-//     * @param arrayList Список для печати.
-//     */
-//    public static void printArray(ArrayList<String> arrayList) {
-//        for (String element : arrayList) {
-//            System.out.println(element);
-//        }
-//    }
 
     @Override
     public void onProgressUpdate(int percent) {

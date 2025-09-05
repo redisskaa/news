@@ -11,6 +11,17 @@
     <string name="title_dashboard2">Категории новостей</string>
     <string name="title_notifications">Notifications</string>
     <string name="loadingText">Загрузка..</string>
-    <string name="userAgent">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36</string>
-    <string name="userAgentMobile">Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/86.0.4240.198 Mobile/15E148 Safari/604.1</string>
+    <string name="yandex"><div style="background-color: rgb(248 240 233);padding:10px;margin:10px 0;"><!-- Yandex.RTB R-A-427920-9 -->
+        <div id="yandex_rtb_R-A-427920-9"></div>
+            <script async="">
+            window.yaContextCb.push(() => {
+                Ya.Context.AdvManager.render({
+                    "blockId": "R-A-427920-9",
+                    "renderTo": "yandex_rtb_R-A-427920-9"
+                })
+            })
+            </script></div></string>
+    <string name="userAgentWindows">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36</string>
+    <string name="user_agent">Mozilla/5.0 (Linux; Android 6.0; Redmi 13C) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36</string>
+    <string name="load">Загрузка..</string>
 </resources>
