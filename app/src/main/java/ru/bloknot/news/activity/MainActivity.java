@@ -19,6 +19,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ru.bloknot.news.R;
 import ru.bloknot.news.adapters.CustomAdapter;
@@ -34,19 +35,20 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> list_full_urls;
     String category;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recycler);
         arrayList = new ArrayList<>();
-        customAdapter = new CustomAdapter(this, arrayList);
+        customAdapter = new CustomAdapter(arrayList);
         recyclerView.setAdapter(customAdapter);
 
         /// Передаем данные из интента DashboardFragment.java
         Intent intent = getIntent();
         category = intent.getStringExtra("cat");
-        setTitle("Тема >> " + category);
+        setTitle(category);
         int pos = intent.getIntExtra("position", 0);
         list = intent.getStringArrayListExtra("list_url");
 
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
             if (result == null || result.isEmpty()) {
                 Toast.makeText(context, "Ошибка загрузки, попробуйте позже", Toast.LENGTH_SHORT).show();
             } else {
-                adapter = new CustomAdapter(context, result);
+                adapter = new CustomAdapter(result);
                 recyclerView.setAdapter(adapter);
                 recView(context, result);
 //                System.out.println("onPostExecute: " + result);
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
             try {
 
-                doc = Jsoup.connect(params[0]).userAgent(context.getResources().getString(R.string.userAgentWindows)).get();
+                doc = Jsoup.connect(params[0]).userAgent(context.getResources().getString(R.string.userAgentMobile)).get();
 
                 doc.select("ul.bigline>li").forEach(element -> {
                     String title = element.select("a.sys").text();
@@ -202,7 +204,13 @@ public class MainActivity extends AppCompatActivity {
                     String time = element.select("span.botinfo").text();
                     String description = element.getElementsByTag("p").text();
                     String url_image = "https:" + element.select("img").attr("src");
-                    arrayList.add(new CardNews(url_image, cat, title, time, description));
+                    //String linkFull = Objects.requireNonNull(element.select("a.sys").first()).absUrl("href");
+
+                    Element linkElement = element.selectFirst("a.sys");  // selectFirst — удобнее, чем select().first()
+                    String linkFull = (linkElement != null) ? linkElement.absUrl("href") : "";
+
+                    System.out.println("params1 " + linkFull);
+                    arrayList.add(new CardNews(url_image, cat, title, time, description, linkFull));
                 });
 
                 String string = arrayList.toString();
@@ -210,11 +218,15 @@ public class MainActivity extends AppCompatActivity {
                 if (string.equals("[]")) {
 
                     doc.select("div.catitem-row>div.catitem").forEach(element -> {
+
                         cat = doc.select("div.news-section-header>h1").text();
                         String title = element.select("a.linksys").text();
                         String time = element.select("span.botinfo").text();
                         String description = element.select("span.previewtext").text();
                         String url_image = "https:" + element.select("img").attr("src");
+                        String linkFull = Objects.requireNonNull(element.select("a.sys").first()).absUrl("href");
+
+                        System.out.println("params2 " + linkFull);
 
                         arrayList.add(new CardNews(url_image, category, title, time, description));
                     });

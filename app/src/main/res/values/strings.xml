@@ -9,19 +9,12 @@
     <string name="title_home2">Последние новости</string>
     <string name="title_dashboard">Категории</string>
     <string name="title_dashboard2">Категории новостей</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_notifications">Настройки</string>
     <string name="loadingText">Загрузка..</string>
-    <string name="yandex"><div style="background-color: rgb(248 240 233);padding:10px;margin:10px 0;"><!-- Yandex.RTB R-A-427920-9 -->
-        <div id="yandex_rtb_R-A-427920-9"></div>
-            <script async="">
-            window.yaContextCb.push(() => {
-                Ya.Context.AdvManager.render({
-                    "blockId": "R-A-427920-9",
-                    "renderTo": "yandex_rtb_R-A-427920-9"
-                })
-            })
-            </script></div></string>
-    <string name="userAgentWindows">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36</string>
-    <string name="user_agent">Mozilla/5.0 (Linux; Android 6.0; Redmi 13C) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36</string>
+    <string name="userAgentMobile">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36</string>
+    <string name="userAgentWindows">Mozilla/5.0 (Android 15; Mobile; rv:141.0) Gecko/141.0 Firefox/141.0</string>
     <string name="load">Загрузка..</string>
+    <string name="no_internet_message">Проверьте подключение и попробуйте снова</string>
+    <string name="retry">Повторить</string>
+    <string name="no_internet">Нет интернета</string>
 </resources>

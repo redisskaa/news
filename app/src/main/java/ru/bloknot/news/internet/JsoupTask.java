@@ -11,9 +11,13 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 import ru.bloknot.news.R;
+import ru.bloknot.news.interfaces.JsoupParseCallback;
+import ru.bloknot.news.utils.Constants;
 
 /** @noinspection deprecation*/ // AsyncTask для парсинга HTML с помощью Jsoup
 public class JsoupTask extends AsyncTask<String, Integer, Elements> {
+
+    String BASE_URL = "https://bloknot-krasnodar.ru";
 
     private final JsoupParseCallback callback;
     private Exception error;
@@ -40,6 +44,13 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
     @Override
     protected Elements doInBackground(String... params) {
         String url = params[0];
+
+        if (url.equals("null")){
+            url = Constants.BASE_URL;
+        }else {
+            url = params[0];
+        }
+
         String cssQuery = params.length > 1 ? params[1] : "body"; // CSS-селектор для выборки элементов
 
         for (int i = 0; i < 101; i++) {
@@ -47,7 +58,7 @@ public class JsoupTask extends AsyncTask<String, Integer, Elements> {
         }
             try {
                 Document doc = Jsoup.connect(url)
-                        .userAgent(context.getResources().getString(R.string.userAgentWindows))
+                        .userAgent(context.getResources().getString(R.string.userAgentMobile))
                         .get();
                 return doc.select(cssQuery);
             } catch (IOException e) {

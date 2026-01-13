@@ -21,14 +21,14 @@ import ru.bloknot.news.R;
 import ru.bloknot.news.activity.MainActivity;
 import ru.bloknot.news.adapters.ListViewAdapter;
 import ru.bloknot.news.databinding.FragmentDashboardBinding;
-import ru.bloknot.news.internet.JsoupParseCallback;
+import ru.bloknot.news.interfaces.JsoupParseCallback;
 import ru.bloknot.news.internet.JsoupTask;
+import ru.bloknot.news.utils.Constants;
 
 public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
     private FragmentDashboardBinding binding;
     private ListView listView;
-    private final String BASE_URL = "https://bloknot-krasnodar.ru";
     private ArrayList<String> listUrl;
     private ProgressBar progressBar;
 
@@ -39,7 +39,7 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
         Context context = container.getContext();
         listView = root.findViewById(R.id.myListView);
         progressBar = root.findViewById(R.id.progBar);
-        new JsoupTask(this, context).execute(BASE_URL, "a.link_nav_second");
+        new JsoupTask(this, context).execute(Constants.BASE_URL, "a.link_nav_second");
         listView.setOnItemClickListener((parent, view, position, id) -> {
             String itemValue = parent.getItemAtPosition(position).toString();
             String pos = listUrl.get(position);
@@ -48,7 +48,7 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             if (position == posi) {
                 Intent intent = new Intent(root.getContext(), MainActivity.class);
                 intent.putExtra("cat", itemValue);
-                intent.putExtra("BASE_URL", BASE_URL);
+                intent.putExtra("BASE_URL", Constants.BASE_URL);
                 intent.putStringArrayListExtra("list_url", listUrl);
                 intent.putExtra("position", posi);
                 startActivity(intent);
@@ -87,8 +87,9 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
         listUrl.set(10, "https://bloknot-krasnodar.ru/news/a_request_to_the_editor/");
         listUrl.set(15, "https://bloknot-krasnodar.ru/structure/holiday_calendar/");
 
-        int[] indicesToRemove = {4};
-
+        int[] indicesToRemove = {2, 4};
+//        data.remove(4);
+//        listUrl.remove(4);
         deleteElementsByIndices(data, indicesToRemove);
         deleteElementsByIndices(listUrl, indicesToRemove);
 

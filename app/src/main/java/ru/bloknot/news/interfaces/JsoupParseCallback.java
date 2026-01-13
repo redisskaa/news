@@ -1,4 +1,4 @@
-package ru.bloknot.news.internet;
+package ru.bloknot.news.interfaces;
 
 import org.jsoup.select.Elements;
 

@@ -4,4 +4,5 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#1E1F22</color>
     <color name="RED">#C62828</color>
+    <color name="purple_500">#902BCB</color>
 </resources>

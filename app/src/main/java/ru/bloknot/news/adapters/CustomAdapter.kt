@@ -1,68 +1,64 @@
-package ru.bloknot.news.adapters;
+package ru.bloknot.news.adapters
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.content.Intent
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import ru.bloknot.news.R.drawable
+import ru.bloknot.news.activity.FullActivity
+import ru.bloknot.news.databinding.MyTestBinding
+import ru.bloknot.news.models.CardNews
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+class CustomAdapter(
+    private val newsList: List<CardNews>,
+) : RecyclerView.Adapter<CustomAdapter.NewsViewHolder>() {
 
-import com.squareup.picasso.Picasso;
-
-import java.util.List;
-
-import ru.bloknot.news.R;
-import ru.bloknot.news.models.CardNews;
-
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-    private final List<CardNews> dataList;
-    private final Context context;
-
-    public CustomAdapter(Context context, List<CardNews> dataList) {
-        this.context = context;
-        this.dataList = dataList;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
+        val binding = MyTestBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return NewsViewHolder(binding)
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_test, parent, false);
-        return new ViewHolder(view);
+    override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
+        holder.bind(newsList[position])
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CardNews data = dataList.get(position);
-        holder.title.setText(data.getTitle());
-        holder.category.setText(data.getCategory());
-        holder.time.setText(data.getTime());
-        holder.description.setText(data.getDescription());
-        Picasso.get()
-                .load(data.getImageUrl())
-                .fit()
-                .placeholder(R.drawable.lazy)
-                .error(R.drawable.error)
-                .into(holder.imageView);
-    }
+    override fun getItemCount(): Int = newsList.size
 
-    @Override
-    public int getItemCount() {
-        return dataList.size();
-    }
+    // ViewHolder с ViewBinding — никаких findViewById!
+    class NewsViewHolder(
+        private val binding: MyTestBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView title, category, time, description;
-        ImageView imageView;
-        public ViewHolder(View itemView) {
-            super(itemView);
-            title = itemView.findViewById(R.id.titleText);
-            category = itemView.findViewById(R.id.catText);
-            time = itemView.findViewById(R.id.timeText);
-            description = itemView.findViewById(R.id.descriptionText);
-            imageView = itemView.findViewById(R.id.imageView);
+        fun bind(item: CardNews) {
+            binding.titleText.text = item.getTitle()
+            binding.catText.text = item.getCategory()
+            binding.timeText.text = item.getTime()
+            binding.descriptionText.text = item.getDescription()
+            val urlFull = item.fullUrlLink
+
+            binding.root.setOnClickListener {
+                Log.d("CLICK_DEBUG", "Клик по новости: ${item.getTitle()}")
+                Log.d("CLICK_DEBUG", "URL перед отправкой: ${item.getFullUrlLink() ?: "NULL или пусто!"}")
+
+                val context = binding.root.context
+                val intent = Intent(context, FullActivity::class.java)
+                intent.putExtra("url", urlFull)  // ← здесь главное! передаём ссылку на полную новость
+
+                context.startActivity(intent)
+            }
+
+            // Coil — лучшая библиотека для загрузки картинок в 2025 году
+            binding.imageView.load(item.imageUrl) {
+                crossfade(true)
+                placeholder(drawable.lazy)     // твой плейсхолдер
+                error(drawable.error)         // ошибка загрузки
+            }
         }
     }
 }

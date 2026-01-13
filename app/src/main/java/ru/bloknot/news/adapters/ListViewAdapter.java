@@ -13,12 +13,10 @@ import ru.bloknot.news.R;
 
 public class ListViewAdapter extends BaseAdapter {
 
-    private Context context;
-    private ArrayList<String> items;
-    private LayoutInflater inflater;
+    private final ArrayList<String> items;
+    private final LayoutInflater inflater;
 
     public ListViewAdapter(Context context, ArrayList<String> items) {
-        this.context = context;
         this.items = items;
         this.inflater = LayoutInflater.from(context);
     }

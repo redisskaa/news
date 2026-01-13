@@ -1,96 +1,84 @@
-package ru.bloknot.news.ui.home;
+package ru.bloknot.news.ui.home
 
-import android.content.Context;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.ProgressBar;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.launch
+import ru.bloknot.news.adapters.CustomAdapter
+import ru.bloknot.news.databinding.FragmentHomeBinding
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+class HomeFragment : Fragment() {
 
-import org.jsoup.select.Elements;
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: HomeViewModel by viewModels()
+    private lateinit var adapter: CustomAdapter
 
-import java.util.ArrayList;
-
-import ru.bloknot.news.R;
-import ru.bloknot.news.databinding.FragmentHomeBinding;
-import ru.bloknot.news.internet.JsoupParseCallback;
-import ru.bloknot.news.internet.JsoupTask;
-
-public class HomeFragment extends Fragment implements JsoupParseCallback {
-
-
-    private FragmentHomeBinding binding;
-    private ListView listView;
-    private final String BASE_URL = "https://bloknot-krasnodar.ru";
-    private ArrayList<String> listUrl;
-    private ProgressBar progressBar;
-
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-        Context context = container.getContext();
-
-        progressBar = root.findViewById(R.id.progBar);
-        new JsoupTask(this, context).execute(BASE_URL, "a.link_nav_second");
-
-        return root;
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    @Override
-    public void onPreExecute() {
-        System.out.println("onPreExecute");
-        progressBar.setVisibility(View.VISIBLE);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        observeUiState()
+        viewModel.loadNews()
+
+        // Pull-to-refresh
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.loadNews()
+        }
     }
 
-    @Override
-    public void onPostExecute(Elements result) {
-
+    private fun setupRecyclerView() {
+        adapter = CustomAdapter(emptyList())
+        binding.recyclerHome.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@HomeFragment.adapter
+        }
     }
 
-    /**
-     * Метод для удаления элементов из ArrayList по списку индексов.
-     *
-     * @param arrayList   Список, из которого нужно удалить элементы.
-     * @param indices     Массив индексов элементов для удаления.
-     */
-    public static void deleteElementsByIndices(ArrayList<String> arrayList, int[] indices) {
-        // Сортируем индексы по убыванию, чтобы избежать смещения при удалении
-        for (int i = 0; i < indices.length; i++) {
-            for (int j = i + 1; j < indices.length; j++) {
-                if (indices[i] < indices[j]) {
-                    int temp = indices[i];
-                    indices[i] = indices[j];
-                    indices[j] = temp;
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState.collect { state ->
+                when (state) {
+                    is HomeUiState.Loading -> {
+                        binding.swipeRefresh.isRefreshing = true
+                    }
+
+                    is HomeUiState.Success -> {
+                        binding.progBarMain.visibility = View.GONE
+                        binding.swipeRefresh.isRefreshing = false
+
+                        // ←←←←←←←←←← ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ! ←←←←←←←←←←
+                        binding.recyclerHome.adapter = CustomAdapter(state.news)
+                    }
+
+                    is HomeUiState.Error -> {
+                        binding.progBarMain.visibility = View.GONE
+                        binding.swipeRefresh.isRefreshing = false
+                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                    }
+
+                    else -> {
+                        println("Что то не так")
+                    }
                 }
             }
         }
-
-        // Удаляем элементы по каждому индексу
-        for (int index : indices) {
-            if (index >= 0 && index < arrayList.size()) {
-                arrayList.remove(index);
-            }
-        }
     }
 
-    @Override
-    public void onProgressUpdate(int percent) {
-        progressBar.setProgress(percent);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
-    @Override
-    public void onError(Exception e) {
-        System.out.println("onError: " + e);
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
