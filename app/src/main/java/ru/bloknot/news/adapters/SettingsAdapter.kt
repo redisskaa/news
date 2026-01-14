@@ -54,7 +54,6 @@ class SettingsAdapter(
     class SwitchViewHolder(private val binding: ItemSettingSwitchBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: SettingsItem, position: Int, onChanged: (Int, Boolean) -> Unit) {
             binding.icon.setImageResource(item.icon)
-            binding.title.text = item.title
             binding.switchItem.isChecked = item.switchChecked
             binding.switchItem.setOnCheckedChangeListener { _, isChecked ->
                 onChanged(position, isChecked)

@@ -1,38 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:gravity="center"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/linerNew"
-        android:gravity="center"
-        android:visibility="gone"
-        android:orientation="vertical"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content">
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:padding="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100" />
-
-        <TextView
-            android:id="@+id/textLoad"
-            android:text="@string/load"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:visibility="visible"
+        android:padding="60dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:max="100" />
 
     <WebView
         android:id="@+id/webView"
         android:visibility="visible"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/linerNew"/>
+        android:layout_height="match_parent" />
 
-</RelativeLayout>
+</LinearLayout>

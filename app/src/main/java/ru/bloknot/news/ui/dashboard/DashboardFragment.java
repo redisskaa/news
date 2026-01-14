@@ -74,6 +74,7 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
         for (int b = 0; b < result.size(); b++) {
             data.add(result.get(b).text());
+            System.out.println("Список: " + b + " " + data.get(b));
         }
 
         listUrl = new ArrayList<>();
@@ -83,13 +84,12 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             listUrl.add(url);
         }
 
-        listUrl.set(7, "https://bloknot-krasnodar.ru/news/officials_of_the_city/");
-        listUrl.set(10, "https://bloknot-krasnodar.ru/news/a_request_to_the_editor/");
-        listUrl.set(15, "https://bloknot-krasnodar.ru/structure/holiday_calendar/");
+//        listUrl.set(7, "https://bloknot-krasnodar.ru/news/officials_of_the_city/");
+        //      listUrl.set(10, "https://bloknot-krasnodar.ru/news/a_request_to_the_editor/");
+//        listUrl.set(15, "https://bloknot-krasnodar.ru/structure/holiday_calendar/");
 
-        int[] indicesToRemove = {2, 4};
-//        data.remove(4);
-//        listUrl.remove(4);
+        int[] indicesToRemove = {2, 4, 15};
+
         deleteElementsByIndices(data, indicesToRemove);
         deleteElementsByIndices(listUrl, indicesToRemove);
 

@@ -8,17 +8,11 @@ import android.view.ViewGroup
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import ru.bloknot.news.NewsApplication
 import ru.bloknot.news.R
 import ru.bloknot.news.adapters.SettingsAdapter
 import ru.bloknot.news.databinding.FragmentNotificationsBinding
 import ru.bloknot.news.models.SettingsItem
-import ru.bloknot.news.worker.NewsUpdateWorker
-import java.util.concurrent.TimeUnit
 
 class SettingsFragment : Fragment() {
 
@@ -36,10 +30,12 @@ class SettingsFragment : Fragment() {
 
         setupSettingsList()
 
+        val context: Context = binding.root.context
+
         val adapter = SettingsAdapter(settingsList) { position, checked ->
             when (position) {
                 0 -> {
-                    toggleNotifications(checked)
+                    toggleNotifications(checked,context)
                     // Обновляем модель
                     settingsList[position] = settingsList[position].copy(switchChecked = checked)
                     // Уведомляем адаптер — теперь безопасно, потому что adapter уже создан!
@@ -54,27 +50,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun setupPeriodicNewsUpdate() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)   // Только при интернете
-            .setRequiresBatteryNotLow(true)                  // Не при низком заряде
-            .build()
-
-        val workRequest = PeriodicWorkRequestBuilder<NewsUpdateWorker>(
-            repeatInterval = 1L,
-            repeatIntervalTimeUnit = TimeUnit.MINUTES
-        )
-            .setConstraints(constraints)
-            .addTag("news_update")
-            .build()
-
-        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-            "news_background_update",           // уникальное имя
-            ExistingPeriodicWorkPolicy.KEEP,     // если уже запущено — не дублируем
-            workRequest
-        )
-    }
-
     private fun setupSettingsList() {
 
         val prefs = requireContext().getSharedPreferences("settings_prefs", Context.MODE_PRIVATE)
@@ -83,28 +58,16 @@ class SettingsFragment : Fragment() {
         settingsList.addAll(listOf(
             SettingsItem(R.drawable.ic_notifications_black_24dp, "Уведомления о новых новостях", "Только свежие",
                 hasSwitch = true, switchChecked = notificationsEnabled),
-            SettingsItem(R.drawable.ic_home_black_24dp, "Тёмная тема", "Следовать системе"),
-            SettingsItem(R.drawable.ic_dashboard_black_24dp, "О приложении", "Версия 1.0"),
-            SettingsItem(R.drawable.ic_launcher_background, "Поделиться приложением"),
-            SettingsItem(R.drawable.ic_no_connection, "Оценить в Google Play"),
-            SettingsItem(R.drawable.ic_no_connection, "Оценить в Google Play"),
-            SettingsItem(R.drawable.ic_no_connection, "Оценить в Google Play"),
-            SettingsItem(R.drawable.ic_no_connection, "Оценить в Google Play"),
-            SettingsItem(R.drawable.ic_no_connection, "Оценить в Google Play"),
-            SettingsItem(R.drawable.ic_no_connection, "Оценить в Google Play"),
-
         ))
     }
 
-    private fun toggleNotifications(enabled: Boolean) {
-        val workManager = WorkManager.getInstance(requireContext())
+    private fun toggleNotifications(enabled: Boolean, context: Context) {
 
         if (enabled) {
-            setupPeriodicNewsUpdate()// вызовем тот же метод из NewsApplication
+            NewsApplication.startNewsBackgroundUpdate(context)  // ← включаем
+
         } else {
-            // Отключаем все уведомления о новостях
-            workManager.cancelUniqueWork("news_background_update")
-            workManager.cancelUniqueWork("test_news_notification_once") // если использовал тест
+            NewsApplication.stopNewsBackgroundUpdate(context)    // ← выключаем
         }
 
         // Сохраняем состояние в SharedPreferences (чтобы после перезапуска приложения чекбокс остался в нужном положении)

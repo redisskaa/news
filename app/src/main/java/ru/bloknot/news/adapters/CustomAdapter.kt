@@ -48,8 +48,8 @@ class CustomAdapter(
 
                 val context = binding.root.context
                 val intent = Intent(context, FullActivity::class.java)
-                intent.putExtra("url", urlFull)  // ← здесь главное! передаём ссылку на полную новость
-
+                intent.putExtra("url", urlFull)
+                intent.putExtra("title", binding.titleText.text)
                 context.startActivity(intent)
             }
 

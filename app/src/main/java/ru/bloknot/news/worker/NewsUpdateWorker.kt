@@ -16,7 +16,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import ru.bloknot.news.R
-import ru.bloknot.news.activity.MainActivity
+import ru.bloknot.news.activity.ListCategory
 import ru.bloknot.news.models.CardNews
 import ru.bloknot.news.utils.Constants
 import java.util.concurrent.TimeUnit
@@ -126,7 +126,8 @@ class NewsUpdateWorker(appContext: Context, params: WorkerParameters) :
     }
 
     private fun sendNotification(title: String) {
-        val intent = Intent(applicationContext, MainActivity::class.java)
+
+        val intent = Intent(applicationContext, ListCategory::class.java)
         val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

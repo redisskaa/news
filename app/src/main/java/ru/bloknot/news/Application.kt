@@ -2,11 +2,10 @@
 package ru.bloknot.news
 
 import android.app.Application
+import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import ru.bloknot.news.worker.NewsUpdateWorker
@@ -16,42 +15,57 @@ class NewsApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        setupPeriodicNewsUpdate()
-        //startTestNotificationWorker()
     }
 
-    private fun startTestNotificationWorker() {
-        val testRequest = OneTimeWorkRequestBuilder<NewsUpdateWorker>()
-            .setInitialDelay(5, TimeUnit.SECONDS)   // через 5 секунд
-            .addTag("test_news_notification")
-            .build()
+    companion object {
+        // Делаем публичный статический метод
+        @JvmStatic
+        fun startNewsBackgroundUpdate(context: Context) {
 
-        WorkManager.getInstance(this)
-            .enqueueUniqueWork(
-                "test_news_notification_once",
-                ExistingWorkPolicy.REPLACE,   // перезапишет, если уже есть
-                testRequest
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresBatteryNotLow(true)
+                .build()
+
+            val workRequest = PeriodicWorkRequestBuilder<NewsUpdateWorker>(
+                repeatInterval = 15,
+                repeatIntervalTimeUnit = TimeUnit.MINUTES  // ← здесь минуты, а не секунды!
             )
+                .setConstraints(constraints)
+                .addTag("news_update")
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                "news_background_update",
+                ExistingPeriodicWorkPolicy.KEEP,
+                workRequest
+            )
+        }
+
+        @JvmStatic
+        fun stopNewsBackgroundUpdate(context: Context) {
+            WorkManager.getInstance(context).cancelUniqueWork("news_background_update")
+        }
     }
 
-    private fun setupPeriodicNewsUpdate() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)   // Только при интернете
-            .setRequiresBatteryNotLow(true)                  // Не при низком заряде
-            .build()
-
-        val workRequest = PeriodicWorkRequestBuilder<NewsUpdateWorker>(
-            repeatInterval = 1L,
-            repeatIntervalTimeUnit = TimeUnit.MINUTES
-        )
-            .setConstraints(constraints)
-            .addTag("news_update")
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "news_background_update",           // уникальное имя
-            ExistingPeriodicWorkPolicy.KEEP,     // если уже запущено — не дублируем
-            workRequest
-        )
-    }
+//    fun setupPeriodicNewsUpdate() {
+//        val constraints = Constraints.Builder()
+//            .setRequiredNetworkType(NetworkType.CONNECTED)   // Только при интернете
+//            .setRequiresBatteryNotLow(true)                  // Не при низком заряде
+//            .build()
+//
+//        val workRequest = PeriodicWorkRequestBuilder<NewsUpdateWorker>(
+//            repeatInterval = 30,
+//            repeatIntervalTimeUnit = TimeUnit.SECONDS
+//        )
+//            .setConstraints(constraints)
+//            .addTag("news_update")
+//            .build()
+//
+//        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+//            "news_background_update",           // уникальное имя
+//            ExistingPeriodicWorkPolicy.KEEP,     // если уже запущено — не дублируем
+//            workRequest
+//        )
+//    }
 }

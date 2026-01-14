@@ -4,6 +4,8 @@ package ru.bloknot.news.activity
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -34,7 +36,7 @@ class FullActivity : AppCompatActivity() {
 
         // Отключаем JS — нам он не нужен, только тормозит
         webView.settings.javaScriptEnabled = false
-        webView.settings.cacheMode = android.webkit.WebSettings.LOAD_NO_CACHE
+        webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
 
         val url = intent.getStringExtra("url") ?: run {
             Toast.makeText(this, "Ошибка: нет ссылки", Toast.LENGTH_SHORT).show()
@@ -42,11 +44,35 @@ class FullActivity : AppCompatActivity() {
             return
         }
 
+        val title = intent.getStringExtra("title") ?: run {
+            Toast.makeText(this, "Ошибка: нет тайтла", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        progressBar.visibility = View.VISIBLE
+
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                super.onProgressChanged(view, newProgress)
+
+                progressBar.progress = newProgress // обновляем ProgressBar
+                setTitle("Загрузка $newProgress %")
+
+                if (newProgress == 100) {
+                    setTitle(title)
+                    progressBar.visibility = View.GONE      // скрываем, когда загрузка завершена
+                    webView.visibility = View.VISIBLE
+                } else {
+                    progressBar.visibility = View.VISIBLE
+                }
+            }
+        }
+
         loadMobileArticle(url)
     }
 
     private fun loadMobileArticle(url: String) {
-        progressBar.visibility = View.VISIBLE
 
         val request = Request.Builder()
             .url(url)
@@ -57,6 +83,7 @@ class FullActivity : AppCompatActivity() {
             .build()
 
         client.newCall(request).enqueue(object : Callback {
+
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
                     progressBar.visibility = View.GONE
@@ -75,7 +102,6 @@ class FullActivity : AppCompatActivity() {
                     val cleanHtml = cleanHtmlForMobile(html)
 
                     runOnUiThread {
-                        progressBar.visibility = View.GONE
                         webView.loadDataWithBaseURL(
                             Constants.BASE_URL,
                             cleanHtml,
@@ -90,43 +116,72 @@ class FullActivity : AppCompatActivity() {
     }
 
     private fun cleanHtmlForMobile(html: String): String {
+        if (html.isBlank()) return "<html><body>Пустая страница</body></html>"
 
-        progressBar.visibility = View.VISIBLE
-
-        val doc = Jsoup.parse(html)
-
-        // Удаляем всё лишнее
-        doc.select("script, noscript, iframe, header, footer, nav, aside, .advert, .banner, .reklama").remove()
-        doc.select("[style*=position:fixed], [class*=ad], [id*=ad]").remove()
-        doc.select("i").remove();
-        doc.select("p img[src*='plashka-novaya.jpg']").parents().remove()
-        doc.select("i:contains(Читайте новости Краснодара)").remove();
-
-        // Вариант 2: если хочешь оставить тег <a>, но убрать ссылку (чтобы текст остался, но без перехода)
-        doc.select("a[href]").forEach { link ->
-            link.removeAttr("href")           // убираем атрибут href
-            link.tagName("span")              // (опционально) меняем тег <a> на <span>
-            link.removeAttr("target")         // убираем target="_blank" если был
-            link.removeAttr("rel")            // убираем rel="noopener" и т.п.
+        val doc = try {
+            Jsoup.parse(html)
+        } catch (e: Exception) {
+            return "<html><body>Ошибка обработки страницы</body></html>"
         }
 
-        // Оставляем только основной контент
-        val article = doc.select("article").first()
-            ?: doc.select(".news-text").first()
+
+
+        // Объединяем удаление в один проход (быстрее и читаемее)
+        doc.select("""
+        script, noscript, iframe, 
+        header, footer, nav, aside, 
+        .advert, .banner, .reklama, 
+        [style*=position:fixed], [class*=ad], [id*=ad], 
+        i, p img[src*='plashka-novaya.jpg']""").remove()
+
+        // Удаляем всё после рекламного <p> (включая сам <p>)
+        doc.select("p:contains(Читайте новости Краснодара и края в удобном формате в нашем Телеграм-канале и в MAX.)")
+            .firstOrNull()
+            ?.let { adNode ->
+                adNode.nextElementSiblings().forEach { it.remove() }
+                adNode.remove()
+            }
+
+        // Отключаем все ссылки одним проходом (чисто и эффективно)
+        doc.select("a[href]").forEach { link ->
+            link.removeAttr("href")
+                .removeAttr("target")
+                .removeAttr("rel")
+                .tagName("span")  // опционально — если хочешь полностью убрать <a>
+        }
+
+        // Выбираем контент — более надёжно
+        val article = doc.selectFirst("article")
+            ?: doc.selectFirst(".news-text, .news-detail, .content, .text, .bloknot-detail-text")
             ?: doc.body()
 
-        // Убираем лишние отступы и делаем читаемый текст
-        val style = """
-            <style>
-                body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 16px; margin: 0; background: white; color: black; }
-                img { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; }
-                h1, h2 { color: #1a1a1a; font-size: 14px;}
-                p { font-size: 17px; margin: 16px 0; }
-                a { color: #0066cc; }
-            </style>
-        """.trimIndent()
+        // Стили выносим в константу (можно даже в отдельный файл)
+        val articleStyle = """
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 16px; margin: 0; background: white; color: black; }
+            
+            img { 
+                max-width: 100%; 
+                height: auto; 
+                border-radius: 12px; 
+                margin: 20px 0; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            
+            h1, h2 { color: #1a1a1a; font-size: 14px;}
+            p { font-size: 17px; margin: 16px 0; }
+            a { color: #0066cc; }
+        </style>
+    """.trimIndent()
 
-        return "<html><head><meta name='viewport' content='width=device-width, initial-scale=1.0'>$style</head><body>${article.html()}</body></html>"
+        return buildString {
+            append("<!DOCTYPE html><html><head><meta charset=\"utf-8\">")
+            append(articleStyle)
+            append("</head><body>")
+            append(article.html())
+            append("</body></html>")
+        }
     }
 
     override fun onDestroy() {

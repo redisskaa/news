@@ -19,7 +19,6 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import ru.bloknot.news.R;
 import ru.bloknot.news.adapters.CustomAdapter;
@@ -224,9 +223,6 @@ public class MainActivity extends AppCompatActivity {
                         String time = element.select("span.botinfo").text();
                         String description = element.select("span.previewtext").text();
                         String url_image = "https:" + element.select("img").attr("src");
-                        String linkFull = Objects.requireNonNull(element.select("a.sys").first()).absUrl("href");
-
-                        System.out.println("params2 " + linkFull);
 
                         arrayList.add(new CardNews(url_image, category, title, time, description));
                     });

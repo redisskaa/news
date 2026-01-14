@@ -19,8 +19,7 @@
         tools:targetApi="33">
         <activity
             android:name=".activity.ListCategory"
-            android:exported="true"
-            android:label="@string/title_activity_list_category" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
