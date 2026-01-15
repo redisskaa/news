@@ -50,11 +50,10 @@ class FullActivity : AppCompatActivity() {
             return
         }
 
-        progressBar.visibility = View.VISIBLE
-
         webView.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
+                progressBar.visibility = View.VISIBLE
 
                 progressBar.progress = newProgress // обновляем ProgressBar
                 setTitle("Загрузка $newProgress %")

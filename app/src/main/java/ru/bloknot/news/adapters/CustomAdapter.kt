@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import ru.bloknot.news.R.drawable
+import coil.request.CachePolicy
+import coil.size.Scale
+import ru.bloknot.news.R
 import ru.bloknot.news.activity.FullActivity
 import ru.bloknot.news.databinding.MyTestBinding
 import ru.bloknot.news.models.CardNews
@@ -55,9 +57,13 @@ class CustomAdapter(
 
             // Coil — лучшая библиотека для загрузки картинок в 2025 году
             binding.imageView.load(item.imageUrl) {
-                crossfade(true)
-                placeholder(drawable.lazy)     // твой плейсхолдер
-                error(drawable.error)         // ошибка загрузки
+                crossfade(false)                          // ← отключаем анимацию появления
+                placeholder(R.drawable.lazy)
+                error(R.drawable.error)
+                scale(Scale.FILL)                         // ← растягивает на весь размер (аналог centerCrop, но без обрезки по центру)
+                allowHardware(false)                      // отключает hardware acceleration для стабильности
+                memoryCachePolicy(CachePolicy.ENABLED)    // кэшируем в памяти
+                diskCachePolicy(CachePolicy.ENABLED)      // кэшируем на диск
             }
         }
     }

@@ -120,15 +120,17 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-
                 CardNews cardNews = listObj.get(position);
+
                 int posi = listObj.indexOf(cardNews);
                 String url = list_full_urls.get(position);
                 System.out.println("Передал url: " + url);
                 if (position == posi) {
+                    String title = cardNews.getTitle();
                     Intent intent = new Intent(context, FullActivity.class);
                     intent.putExtra("url", url);
                     intent.putExtra("position", posi);
+                    intent.putExtra("title", title);
                     startActivity(intent);
                 }
             }

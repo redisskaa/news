@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import ru.bloknot.news.R;
 import ru.bloknot.news.activity.MainActivity;
@@ -84,14 +86,29 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             listUrl.add(url);
         }
 
-//        listUrl.set(7, "https://bloknot-krasnodar.ru/news/officials_of_the_city/");
-        //      listUrl.set(10, "https://bloknot-krasnodar.ru/news/a_request_to_the_editor/");
-//        listUrl.set(15, "https://bloknot-krasnodar.ru/structure/holiday_calendar/");
+        listUrl.set(10, "https://bloknot-krasnodar.ru/news/a_request_to_the_editor/");
+        listUrl.set(7, "https://bloknot-krasnodar.ru/news/officials_of_the_city/");
 
-        int[] indicesToRemove = {2, 4, 15};
+        listUrl.remove(2);
+        listUrl.remove(14);
+        listUrl.remove(16);
+        listUrl.remove(3);
 
-        deleteElementsByIndices(data, indicesToRemove);
-        deleteElementsByIndices(listUrl, indicesToRemove);
+        WordRemover.removeItemsContainingWords(data, getString(R.string.wordsRemove));
+
+//        for (int c = 0; c < listUrl.size(); c++) {
+//            System.out.println("Список URL после удаления: " + c + " " + listUrl.get(c));
+//        }
+//
+//        try {
+//            for (int b = 0; b < result.size(); b++) {
+//                System.out.println("Список категорий после удаления: " + b + " " + data.get(b));
+//            }
+//
+//        }catch (IndexOutOfBoundsException e){
+//            System.out.println("Ошибка");
+//        }
+
 
         ListViewAdapter adapter = new ListViewAdapter(getContext(), data);
         adapter.notifyDataSetChanged();
@@ -124,6 +141,65 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
             }
         }
     }
+
+    public static class WordRemover {
+
+        /**
+         * Удаляет из списка элементы, содержащие любое из указанных слов (без учёта регистра).
+         * Слова задаются через запятую.
+         *
+         * @param list          Список строк для обработки
+         * @param wordsToRemove Слова для поиска (через запятую), например "кот, собака, птица"
+         */
+        public static void removeItemsContainingWords(
+                ArrayList<String> list,
+                String wordsToRemove
+        ) {
+            // 1. Обрабатываем строку слов: разбиваем, чистим, собираем в набор
+            Set<String> wordSet = parseWords(wordsToRemove);
+
+            // 2. Если слов нет — ничего не делаем
+            if (wordSet.isEmpty()) {
+                return;
+            }
+
+            // 3. Удаляем элементы, содержащие хотя бы одно из слов
+            list.removeIf(item -> containsAnyWord(item, wordSet));
+        }
+
+        // Вспомогательный метод: преобразует строку слов в набор (в нижнем регистре)
+        private static Set<String> parseWords(String wordsStr) {
+            Set<String> wordSet = new HashSet<>();
+
+            if (wordsStr == null || wordsStr.trim().isEmpty()) {
+                return wordSet;
+            }
+
+            String[] words = wordsStr.split(",");
+            for (String word : words) {
+                String trimmedWord = word.trim();
+                if (!trimmedWord.isEmpty()) {
+                    wordSet.add(trimmedWord.toLowerCase());
+                }
+            }
+
+            return wordSet;
+        }
+
+        // Вспомогательный метод: проверяет, содержит ли строка хотя бы одно слово из набора
+        private static boolean containsAnyWord(String item, Set<String> words) {
+            String itemLower = item.toLowerCase();
+
+            for (String word : words) {
+                if (itemLower.contains(word)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
 
     @Override
     public void onProgressUpdate(int percent) {

@@ -17,4 +17,5 @@
     <string name="no_internet_message">Проверьте подключение и попробуйте снова</string>
     <string name="retry">Повторить</string>
     <string name="no_internet">Нет интернета</string>
+    <string name="wordsRemove">БЛОКНОТ ПУТЕШЕСТВЕННИКА, КОНКУРСЫ, СПЕЦПРОЕКТЫ, ХОЗЯЙСТВО</string>
 </resources>

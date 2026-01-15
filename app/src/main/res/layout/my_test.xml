@@ -33,10 +33,10 @@
 
     <androidx.cardview.widget.CardView
         android:layout_gravity="center"
-        android:layout_width="245dp"
-        android:layout_height="182dp"
-        app:cardCornerRadius="13dp"
-        app:cardElevation="5dp"
+        android:layout_width="240dp"
+        android:layout_height="180dp"
+        card_view:cardCornerRadius="5dp"
+        card_view:cardElevation="5dp"
         app:ignore="NamespaceTypo">
 
     <ImageView
