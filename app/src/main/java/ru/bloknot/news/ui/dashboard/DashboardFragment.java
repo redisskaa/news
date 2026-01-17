@@ -74,40 +74,53 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
         ArrayList<String> data = new ArrayList<>();
 
-        for (int b = 0; b < result.size(); b++) {
-            data.add(result.get(b).text());
-            System.out.println("Список: " + b + " " + data.get(b));
+        try {
+
+            for (int b = 0; b < result.size(); b++) {
+
+                if (b == 0){
+                    System.out.println("Первый for: начало");
+                    System.out.println("-------------------");
+                }
+
+                data.add(result.get(b).text());
+                //System.out.println("Список: " + b + " " + data.get(b));
+            }
+
+            if (data.size() == result.size()){
+                System.out.println("Первый for: конец");
+            }
+
+            listUrl = new ArrayList<>();
+
+            for (int c = 0; c < result.size(); c++) {
+
+                if (c == 0){
+                    System.out.println("Второй for: начало");
+                    System.out.println("-------------------");
+                }
+
+                String url = result.get(c).attr("abs:href");
+                listUrl.add(url);
+            }
+
+            if (listUrl.size() == result.size()){
+                System.out.println("Второй for: конец");
+            }
+
+            listUrl.set(10, "https://bloknot-krasnodar.ru/news/a_request_to_the_editor/");
+            listUrl.set(7, "https://bloknot-krasnodar.ru/news/officials_of_the_city/");
+
+            listUrl.remove(2);
+            listUrl.remove(14);
+            listUrl.remove(16);
+            listUrl.remove(3);
+
+            WordRemover.removeItemsContainingWords(data, getString(R.string.wordsRemove));
+
+        }catch (IndexOutOfBoundsException e){
+            System.out.println("Ошибка: " + e.getMessage());
         }
-
-        listUrl = new ArrayList<>();
-
-        for (int c = 0; c < result.size(); c++) {
-            String url = result.get(c).attr("abs:href");
-            listUrl.add(url);
-        }
-
-        listUrl.set(10, "https://bloknot-krasnodar.ru/news/a_request_to_the_editor/");
-        listUrl.set(7, "https://bloknot-krasnodar.ru/news/officials_of_the_city/");
-
-        listUrl.remove(2);
-        listUrl.remove(14);
-        listUrl.remove(16);
-        listUrl.remove(3);
-
-        WordRemover.removeItemsContainingWords(data, getString(R.string.wordsRemove));
-
-//        for (int c = 0; c < listUrl.size(); c++) {
-//            System.out.println("Список URL после удаления: " + c + " " + listUrl.get(c));
-//        }
-//
-//        try {
-//            for (int b = 0; b < result.size(); b++) {
-//                System.out.println("Список категорий после удаления: " + b + " " + data.get(b));
-//            }
-//
-//        }catch (IndexOutOfBoundsException e){
-//            System.out.println("Ошибка");
-//        }
 
 
         ListViewAdapter adapter = new ListViewAdapter(getContext(), data);

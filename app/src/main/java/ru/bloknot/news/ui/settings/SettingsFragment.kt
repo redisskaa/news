@@ -1,11 +1,17 @@
 package ru.bloknot.news.ui.settings
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.bloknot.news.NewsApplication
@@ -29,6 +35,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupSettingsList()
+        setHasOptionsMenu(true)
 
         val context: Context = binding.root.context
 
@@ -48,6 +55,49 @@ class SettingsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = adapter  // привязываем
         }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_options, menu) // Подключаем ваш xml-файл меню
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.dialogItem) {
+            showDialog()
+        } else {
+            return super.onOptionsItemSelected(item)
+        }
+        return true
+    }
+
+    private fun showDialog(){
+        val dialog: AlertDialog = AlertDialog.Builder(binding.root.context)
+            .setTitle(getString(R.string.info))
+            .setIcon(R.drawable.ic_no_connection)
+            .setCancelable(false)
+            .setMessage(getString(R.string.description))
+            .setPositiveButton("OK") { dialog, _ ->
+               dialog.dismiss()
+            }
+            .setNegativeButton("Написать") { _, _ ->
+                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = "mailto:ser47400@yandex.ru".toUri()
+                    putExtra(Intent.EXTRA_TEXT, "Напишите ваше сообщение")
+                    putExtra(Intent.EXTRA_SUBJECT, "Калькулятор")
+                }
+                startActivity(emailIntent)
+            }
+            .setNeutralButton("Поддержать") { _, _ ->
+                val url = "https://yoomoney.ru/to/41001629268067"
+                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                startActivity(intent)
+            }
+            .create()
+
+        dialog.show()
     }
 
     private fun setupSettingsList() {

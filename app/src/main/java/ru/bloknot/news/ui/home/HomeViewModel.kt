@@ -65,7 +65,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val list = mutableListOf<CardNews>()
 
             // 1. Пробуем десктопную версию (ul.bigline)
-            var items = doc.select("ul.bigline > li")
+            val items = doc.select("ul.bigline > li")
+
             if (items.isNotEmpty()) {
                 items.forEach { li ->
                     try {
@@ -84,16 +85,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 return@withContext list
             }
 
-            items = doc.select("article")
+            val items1 = doc.select("article")
 
-            items.forEach { el ->
+            items1.forEach { el ->
                 try {
                     val titleEl = el.select("h2")
                     val title = titleEl.text()
                     val descr = el.select("h2")[1].text()
                     val category = el.selectFirst("a")?.text()
                     val img = el.selectFirst("img")?.absUrl("src") ?:
-                        el.selectFirst("img")?.attr("data-src") ?: ""
+                    el.selectFirst("img")?.attr("data-src") ?: ""
 
                     val time = el.select("span").text()
                     val linkFull = el.select("a")[1]?.absUrl("href")
@@ -106,6 +107,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
             return@withContext list
         }
+    }
+
+    fun removeDuplicates(list: ArrayList<String?>): ArrayList<String?> {
+        // Вариант 1 — самый понятный и надёжный для начинающих
+        val uniqueSet = LinkedHashSet(list)     // сохраняет порядок добавления
+        return ArrayList(uniqueSet)
+
+        // Вариант 2 — ещё короче (но тоже сохраняет порядок)
+        // return ArrayList(LinkedHashSet(list))
     }
 }
 

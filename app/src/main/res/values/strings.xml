@@ -5,7 +5,7 @@
     <string name="textTitle">Загрузка…</string>
     <string name="textTime">Загрузка…</string>
     <string name="title_activity_list_category">ListCategory</string>
-    <string name="title_home">Недавнее</string>
+    <string name="title_home">Свежее</string>
     <string name="title_home2">Последние новости</string>
     <string name="title_dashboard">Категории</string>
     <string name="title_dashboard2">Категории новостей</string>
@@ -18,4 +18,8 @@
     <string name="retry">Повторить</string>
     <string name="no_internet">Нет интернета</string>
     <string name="wordsRemove">БЛОКНОТ ПУТЕШЕСТВЕННИКА, КОНКУРСЫ, СПЕЦПРОЕКТЫ, ХОЗЯЙСТВО</string>
+    <string name="description">
+        Приложение для просмотра новостей, по категориям, а также новые новости. Есть настройка уведомлений о новых новостях
+    </string>
+    <string name="info">Информация</string>
 </resources>
