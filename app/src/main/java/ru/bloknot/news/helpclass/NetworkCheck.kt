@@ -1,36 +1,42 @@
-package ru.bloknot.news.helpclass;
+// File: app/src/main/java/ru/bloknot/news/helpclass/NetworkCheck.kt
+package ru.bloknot.news.helpclass
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 
-public class NetworkCheck {
-    private static final int TYPE_WIFI = 1;
-    private static final int TYPE_MOBILE = 2;
-    private static final int TYPE_NOT_CONNECTED = 0;
+object NetworkCheck {
 
-    public static int getConnectivityStatus(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
+    private const val TYPE_WIFI = 1
+    private const val TYPE_MOBILE = 2
+    private const val TYPE_NOT_CONNECTED = 0
 
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+    // TODO: NetworkInfo и getActiveNetworkInfo() deprecated с API 29.
+    //  Заменить на ConnectivityManager.NetworkCallback — отдельным коммитом после миграции.
 
-        if (networkInfo != null) {
-            if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI
-                    && networkInfo.getState() == NetworkInfo.State.CONNECTED) {
+    @JvmStatic
+    fun getConnectivityStatus(context: Context): Int {
+        val connectivityManager = context
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+            ?: return TYPE_NOT_CONNECTED
 
-                return TYPE_WIFI;
+        val networkInfo: NetworkInfo = connectivityManager.activeNetworkInfo
+            ?: return TYPE_NOT_CONNECTED
 
-            } else if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE
-                    && networkInfo.getState() == NetworkInfo.State.CONNECTED) {
-                return TYPE_MOBILE;
-            }
+        return when {
+            networkInfo.type == ConnectivityManager.TYPE_WIFI &&
+                    networkInfo.state == NetworkInfo.State.CONNECTED -> TYPE_WIFI
+
+            networkInfo.type == ConnectivityManager.TYPE_MOBILE &&
+                    networkInfo.state == NetworkInfo.State.CONNECTED -> TYPE_MOBILE
+
+            else -> TYPE_NOT_CONNECTED
         }
-        return TYPE_NOT_CONNECTED;
     }
 
-    public static boolean isNetworkConnected(Context context) {
-        int networkStatus = getConnectivityStatus(context);
-        return networkStatus == TYPE_WIFI || networkStatus == TYPE_MOBILE;
+    @JvmStatic
+    fun isNetworkConnected(context: Context): Boolean {
+        val status = getConnectivityStatus(context)
+        return status == TYPE_WIFI || status == TYPE_MOBILE
     }
 }

@@ -166,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
         return bannerAd;
     }
 
+    @SuppressLint("ThreadConstraint")
     public void getFullNews(String url_cat, Context context) {
         new Thread(() -> {
             try {
