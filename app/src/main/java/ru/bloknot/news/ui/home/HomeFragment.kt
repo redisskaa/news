@@ -1,6 +1,7 @@
 package ru.bloknot.news.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import ru.bloknot.news.adapters.CustomAdapter
 import ru.bloknot.news.databinding.FragmentHomeBinding
+import ru.bloknot.news.models.CardNews
 
 class HomeFragment : Fragment() {
 
@@ -29,6 +31,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("Starting", "Стартуем HomeFragment")
         setupRecyclerView()
         observeUiState()
         viewModel.loadNews()
@@ -40,7 +43,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = CustomAdapter(emptyList())
+        adapter = CustomAdapter(mutableListOf())
         binding.recyclerHome.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = this@HomeFragment.adapter
@@ -60,7 +63,7 @@ class HomeFragment : Fragment() {
                         binding.swipeRefresh.isRefreshing = false
 
                         // ←←←←←←←←←← ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ! ←←←←←←←←←←
-                        binding.recyclerHome.adapter = CustomAdapter(state.news)
+                        binding.recyclerHome.adapter = CustomAdapter(state.news as MutableList<CardNews>)
                     }
 
                     is HomeUiState.Error -> {

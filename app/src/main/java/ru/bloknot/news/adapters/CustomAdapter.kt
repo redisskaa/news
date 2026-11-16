@@ -4,6 +4,8 @@ import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.request.CachePolicy
@@ -11,11 +13,13 @@ import coil.size.Scale
 import ru.bloknot.news.R
 import ru.bloknot.news.activity.FullActivity
 import ru.bloknot.news.databinding.MyTestBinding
+import ru.bloknot.news.helpclass.SearchHelper
 import ru.bloknot.news.models.CardNews
 
+
 class CustomAdapter(
-    private val newsList: List<CardNews>,
-) : RecyclerView.Adapter<CustomAdapter.NewsViewHolder>() {
+    private var newsList: List<CardNews>) : ListAdapter<CardNews, CustomAdapter.NewsViewHolder>(NewsDiffCallback()) {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val binding = MyTestBinding.inflate(
@@ -28,6 +32,19 @@ class CustomAdapter(
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.bind(newsList[position])
+    }
+
+    // Метод для обновления всего списка (из ViewModel)
+    fun updateNews(newNews: List<CardNews>) {
+        submitList(newNews)
+    }
+
+    // Метод для поиска — вызывается из ViewModel или Fragment
+    fun filter(query: String, allNews: List<CardNews>) {
+        Log.d("SEARCH", "Фильтр по: $query, всего новостей: ${allNews.size}")
+        val filtered = SearchHelper.search(query, allNews)
+        Log.d("SEARCH", "Результат: ${filtered.size} новостей")
+        submitList(filtered)
     }
 
     override fun getItemCount(): Int = newsList.size
@@ -67,4 +84,18 @@ class CustomAdapter(
             }
         }
     }
+
+    // Сравнение элементов для плавного обновления списка
+    class NewsDiffCallback : DiffUtil.ItemCallback<CardNews>() {
+        override fun areItemsTheSame(oldItem: CardNews, newItem: CardNews): Boolean {
+            // Сравниваем по уникальному полю (лучше всего — по id или title + time)
+            return oldItem.getTitle() == newItem.getTitle() && oldItem.getTime() == newItem.getTime()
+        }
+
+        override fun areContentsTheSame(oldItem: CardNews, newItem: CardNews): Boolean {
+            return oldItem.fullUrlLink == newItem.fullUrlLink  // полное сравнение
+        }
+    }
+
+
 }

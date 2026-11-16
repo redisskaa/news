@@ -36,6 +36,8 @@ public class DashboardFragment extends Fragment implements JsoupParseCallback {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        Log.d("Starting", "Стартуем DashboardFragment");
+
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         Context context = container.getContext();

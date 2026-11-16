@@ -5,11 +5,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.yandex.mobile.ads.banner.BannerAdEventListener;
+import com.yandex.mobile.ads.banner.BannerAdSize;
+import com.yandex.mobile.ads.banner.BannerAdView;
+import com.yandex.mobile.ads.common.AdRequest;
+import com.yandex.mobile.ads.common.AdRequestError;
+import com.yandex.mobile.ads.common.ImpressionData;
+import com.yandex.mobile.ads.common.MobileAds;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,8 +36,10 @@ import java.util.List;
 
 import ru.bloknot.news.R;
 import ru.bloknot.news.adapters.CustomAdapter;
+import ru.bloknot.news.databinding.ActivityMainBinding;
 import ru.bloknot.news.helpclass.NetworkCheck;
 import ru.bloknot.news.helpclass.RecyclerItemClickListener;
+import ru.bloknot.news.helpclass.SearchHelper;
 import ru.bloknot.news.models.CardNews;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,12 +49,38 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> list;
     ArrayList<String> list_full_urls;
     String category;
+    ActivityMainBinding binding;
+    FirebaseAnalytics mFirebaseAnalytics;
+    BannerAdView mBannerAd;
 
+    String id = "R-M-18977543-2";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        MobileAds.initialize(this, () -> {
+            // now you can use ads
+        });
+
+
+        binding.adContainerView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        binding.adContainerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        mBannerAd = loadBannerAd(getAdSize(), id);
+                    }
+                }
+        );
+
+        Log.d("Starting", "Стартуем MainActivity");
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         recyclerView = findViewById(R.id.recycler);
         arrayList = new ArrayList<>();
         customAdapter = new CustomAdapter(arrayList);
@@ -59,6 +101,71 @@ public class MainActivity extends AppCompatActivity {
         getFullNews(url, this);
     }
 
+    @NonNull
+    private BannerAdSize getAdSize() {
+
+        final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        // Calculate the width of the ad, taking into account the padding in the ad container.
+        int adWidthPixels = binding.adContainerView.getWidth();
+        if (adWidthPixels == 0) {
+            // If the ad hasn't been laid out, default to the full screen width
+            adWidthPixels = displayMetrics.widthPixels;
+        }
+        final int adWidth = Math.round(adWidthPixels / displayMetrics.density);
+
+        return BannerAdSize.stickySize(this, adWidth);
+    }
+
+    @NonNull
+    private BannerAdView loadBannerAd(@NonNull final BannerAdSize adSize, String id) {
+        final BannerAdView bannerAd = binding.adContainerView;
+        bannerAd.setAdSize(adSize);
+        bannerAd.setAdUnitId(id);
+        bannerAd.setBannerAdEventListener(new BannerAdEventListener() {
+            @Override
+            public void onAdLoaded() {
+                // If this callback occurs after the activity is destroyed, you
+                // must call destroy and return or you may get a memory leak.
+                // Note `isDestroyed` is a method on Activity.
+
+                if (isDestroyed() && mBannerAd != null) {
+                    mBannerAd.destroy();
+                }
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull final AdRequestError adRequestError) {
+                // Ad failed to load with AdRequestError.
+                // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Called when a click is recorded for an ad.
+            }
+
+            @Override
+            public void onLeftApplication() {
+                // Called when user is about to leave application (e.g., to go to the browser), as a result of clicking on the ad.
+            }
+
+            @Override
+            public void onReturnedToApplication() {
+                // Called when user returned to application after click.
+            }
+
+            @Override
+            public void onImpression(@Nullable ImpressionData impressionData) {
+                // Called when an impression is recorded for an ad.
+            }
+        });
+        final AdRequest adRequest = new AdRequest.Builder()
+                // Methods in the AdRequest.Builder class can be used here to specify individual options settings.
+                .build();
+        bannerAd.loadAd(adRequest);
+        return bannerAd;
+    }
+
     public void getFullNews(String url_cat, Context context) {
         new Thread(() -> {
             try {
@@ -73,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 Elements elements1 = doc.select("div.structure-section>a.structure-section__item[href]");
                 Elements konkursy = doc.select(".last__item>a[href]");
 
-                /// Если найдены элементы то выполняем действия дальше
+                /// Если найдены элементы, то выполняем действия дальше
                 if (elements.is("a[href]")){
                     // Проходим по всем найденным ссылкам и выводим их значения
                     for (Element link : links) {
@@ -114,6 +221,56 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
+
+    // Метод фильтрации — использует SearchHelper
+    private void filterNews(String query) {
+        List<CardNews> filtered = SearchHelper.search(query, arrayList);
+
+        // Обновляем адаптер
+        customAdapter.updateNews(new ArrayList<>(filtered));  // передаём отфильтрованный список
+    }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.top_menu, menu);  // твой menu/top_menu.xml
+//
+//        MenuItem searchItem = menu.findItem(R.id.action_search);
+//        SearchView searchView = (SearchView) searchItem.getActionView();
+//
+//        assert searchView != null;
+//        searchView.setQueryHint("Поиск по новостям...");
+//
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                searchView.clearFocus();  // закрываем клавиатуру
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                List<CardNews> filtered = SearchHelper.search(newText, arrayList);
+//                customAdapter.filter(newText, new ArrayList<>(filtered));
+//                return true;
+//            }
+//        });
+//
+//        // При сворачивании поиска — возвращаем полный список
+//        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+//            @Override
+//            public boolean onMenuItemActionExpand(@NonNull MenuItem item) {
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onMenuItemActionCollapse(@NonNull MenuItem item) {
+//
+//                return true;
+//            }
+//        });
+//
+//        return true;
+//    }
 
     public void recView(Context context, List<CardNews> listObj) throws IndexOutOfBoundsException{
 

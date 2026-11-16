@@ -1,4 +1,3 @@
-// File: app/src/main/java/ru/bloknot/news/NewsApplication.kt
 package ru.bloknot.news
 
 import android.app.Application
@@ -11,7 +10,7 @@ import androidx.work.WorkManager
 import ru.bloknot.news.worker.NewsUpdateWorker
 import java.util.concurrent.TimeUnit
 
-class NewsApplication : Application() {
+open class NewsApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -47,25 +46,4 @@ class NewsApplication : Application() {
             WorkManager.getInstance(context).cancelUniqueWork("news_background_update")
         }
     }
-
-//    fun setupPeriodicNewsUpdate() {
-//        val constraints = Constraints.Builder()
-//            .setRequiredNetworkType(NetworkType.CONNECTED)   // Только при интернете
-//            .setRequiresBatteryNotLow(true)                  // Не при низком заряде
-//            .build()
-//
-//        val workRequest = PeriodicWorkRequestBuilder<NewsUpdateWorker>(
-//            repeatInterval = 30,
-//            repeatIntervalTimeUnit = TimeUnit.SECONDS
-//        )
-//            .setConstraints(constraints)
-//            .addTag("news_update")
-//            .build()
-//
-//        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-//            "news_background_update",           // уникальное имя
-//            ExistingPeriodicWorkPolicy.KEEP,     // если уже запущено — не дублируем
-//            workRequest
-//        )
-//    }
 }

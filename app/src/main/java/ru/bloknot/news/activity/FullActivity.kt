@@ -3,24 +3,25 @@ package ru.bloknot.news.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.Jsoup
+import ru.bloknot.news.BaseActivity
 import ru.bloknot.news.R
 import ru.bloknot.news.utils.Constants
 import java.io.IOException
 
-class FullActivity : AppCompatActivity() {
+class FullActivity : BaseActivity() {
 
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
@@ -33,6 +34,8 @@ class FullActivity : AppCompatActivity() {
 
         webView = findViewById(R.id.webView)
         progressBar = findViewById(R.id.progressBar)
+
+        Log.d("Starting", "Стартуем FullActivity")
 
         // Отключаем JS — нам он не нужен, только тормозит
         webView.settings.javaScriptEnabled = false
@@ -63,6 +66,7 @@ class FullActivity : AppCompatActivity() {
                     progressBar.visibility = View.GONE      // скрываем, когда загрузка завершена
                     webView.visibility = View.VISIBLE
                 } else {
+                    adsYandex()
                     progressBar.visibility = View.VISIBLE
                 }
             }

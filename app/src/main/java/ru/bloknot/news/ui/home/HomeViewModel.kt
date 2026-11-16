@@ -108,14 +108,5 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             return@withContext list
         }
     }
-
-    fun removeDuplicates(list: ArrayList<String?>): ArrayList<String?> {
-        // Вариант 1 — самый понятный и надёжный для начинающих
-        val uniqueSet = LinkedHashSet(list)     // сохраняет порядок добавления
-        return ArrayList(uniqueSet)
-
-        // Вариант 2 — ещё короче (но тоже сохраняет порядок)
-        // return ArrayList(LinkedHashSet(list))
-    }
 }
 
