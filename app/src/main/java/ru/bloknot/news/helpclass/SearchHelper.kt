@@ -1,34 +1,21 @@
-package ru.bloknot.news.helpclass;
+// File: app/src/main/java/ru/bloknot/news/helpclass/SearchHelper.kt
+package ru.bloknot.news.helpclass
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import ru.bloknot.news.models.CardNews
+import java.util.Locale
 
-import ru.bloknot.news.models.CardNews;
+object SearchHelper {
 
-public class SearchHelper {
+    @JvmStatic
+    fun search(query: String?, allNews: List<CardNews>): List<CardNews> {
+        if (query == null || query.trim().length < 3) return emptyList()
 
-    public static List<CardNews> search(String query, List<CardNews> allNews) {
-        List<CardNews> results = new ArrayList<>();
+        val lowerQuery = query.trim().lowercase(Locale.getDefault())
 
-        if (query == null || query.trim().length() < 3) {
-            return results; // меньше 3 букв — ничего не возвращаем
+        return allNews.filter { news ->
+            news.title.lowercase(Locale.getDefault()).contains(lowerQuery) ||
+                    news.description.lowercase(Locale.getDefault()).contains(lowerQuery) ||
+                    news.category.lowercase(Locale.getDefault()).startsWith(lowerQuery)
         }
-
-        String lowerQuery = query.trim().toLowerCase(Locale.getDefault());
-
-        for (CardNews news : allNews) {
-            String title = news.getTitle() != null ? news.getTitle().toLowerCase(Locale.getDefault()) : "";
-            String desc = news.getDescription() != null ? news.getDescription().toLowerCase(Locale.getDefault()) : "";
-            String cat = news.getCategory() != null ? news.getCategory().toLowerCase(Locale.getDefault()) : "";
-
-            if (title.contains(lowerQuery) ||
-                    desc.contains(lowerQuery) ||
-                    cat.startsWith(lowerQuery)) {  // первые буквы категории
-                results.add(news);
-            }
-        }
-
-        return results;
     }
 }

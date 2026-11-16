@@ -1,12 +1,10 @@
-package ru.bloknot.news.interfaces;
+package ru.bloknot.news.interfaces
 
-import org.jsoup.select.Elements;
+import org.jsoup.select.Elements
 
-
-public interface JsoupParseCallback {
-
-    void onProgressUpdate(int percent);
-    void onPreExecute();
-    void onPostExecute(Elements result);
-    void onError(Exception e);
+interface JsoupParseCallback {
+    fun onProgressUpdate(percent: Int)
+    fun onPreExecute()
+    fun onPostExecute(result: Elements)
+    fun onError(e: Exception)
 }
