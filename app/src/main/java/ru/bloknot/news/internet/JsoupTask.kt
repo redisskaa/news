@@ -1,80 +1,60 @@
-package ru.bloknot.news.internet;
+// File: app/src/main/java/ru/bloknot/news/internet/JsoupTask.kt
+package ru.bloknot.news.internet
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.os.AsyncTask;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.AsyncTask
+import org.jsoup.Jsoup
+import org.jsoup.select.Elements
+import ru.bloknot.news.R
+import ru.bloknot.news.interfaces.JsoupParseCallback
+import ru.bloknot.news.utils.Constants
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
+@SuppressLint("StaticFieldLeak")
+@Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+class JsoupTask(
+    private val callback: JsoupParseCallback?,
+    private val context: Context
+) : AsyncTask<String, Int?, Elements?>() {
 
-import java.io.IOException;
+    private var error: Exception? = null
 
-import ru.bloknot.news.R;
-import ru.bloknot.news.interfaces.JsoupParseCallback;
-import ru.bloknot.news.utils.Constants;
-
-/** @noinspection deprecation*/ // AsyncTask для парсинга HTML с помощью Jsoup
-public class JsoupTask extends AsyncTask<String, Integer, Elements> {
-
-    String BASE_URL = "https://bloknot-krasnodar.ru";
-
-    private final JsoupParseCallback callback;
-    private Exception error;
-    @SuppressLint("StaticFieldLeak")
-    Context context;
-
-    public JsoupTask(JsoupParseCallback callback, Context context) {
-        this.callback = callback;
-        this.context = context;
+    override fun onProgressUpdate(vararg values: Int?) {
+        values.firstOrNull()?.let { callback?.onProgressUpdate(it) }
     }
 
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-        callback.onProgressUpdate(values[0]);
+    override fun onPreExecute() {
+        callback?.onPreExecute()
     }
 
-    @Override
-    protected void onPreExecute() {
-        if (callback != null) {
-            callback.onPreExecute();
+    override fun doInBackground(vararg params: String?): Elements? {
+        val rawUrl = params.getOrNull(0) ?: Constants.BASE_URL
+        val url = if (rawUrl == "null") Constants.BASE_URL else rawUrl
+        val cssQuery = params.getOrNull(1) ?: "body"
+
+        // ⚠️ Сохраняем поведение оригинала: прогресс публикуется ДО сетевого запроса.
+        //    Это баг, но чиним отдельным коммитом, чтобы не смешивать с миграцией.
+        for (i in 0..100) {
+            publishProgress(i)
+        }
+
+        return try {
+            val doc = Jsoup.connect(url)
+                .userAgent(context.resources.getString(R.string.userAgentMobile))
+                .get()
+            doc.select(cssQuery)
+        } catch (e: Exception) {
+            error = e
+            null
         }
     }
 
-    @Override
-    protected Elements doInBackground(String... params) {
-        String url = params[0];
-
-        if (url.equals("null")){
-            url = Constants.BASE_URL;
-        }else {
-            url = params[0];
-        }
-
-        String cssQuery = params.length > 1 ? params[1] : "body"; // CSS-селектор для выборки элементов
-
-        for (int i = 0; i < 101; i++) {
-            publishProgress(i);
-        }
-            try {
-                Document doc = Jsoup.connect(url)
-                        .userAgent(context.getResources().getString(R.string.userAgentMobile))
-                        .get();
-                return doc.select(cssQuery);
-            } catch (IOException e) {
-                error = e;
-                return null;
-            }
-    }
-
-    @Override
-    protected void onPostExecute(Elements elements) {
-        if (callback != null) {
-            if (elements != null) {
-                callback.onPostExecute(elements);
-            } else {
-                callback.onError(error);
-            }
+    override fun onPostExecute(elements: Elements?) {
+        if (callback == null) return
+        if (elements != null) {
+            callback.onPostExecute(elements)
+        } else {
+            callback.onError(error ?: RuntimeException("Unknown error in JsoupTask"))
         }
     }
 }

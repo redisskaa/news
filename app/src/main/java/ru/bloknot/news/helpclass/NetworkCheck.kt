@@ -23,13 +23,9 @@ object NetworkCheck {
         val networkInfo: NetworkInfo = connectivityManager.activeNetworkInfo
             ?: return TYPE_NOT_CONNECTED
 
-        return when {
-            networkInfo.type == ConnectivityManager.TYPE_WIFI &&
-                    networkInfo.state == NetworkInfo.State.CONNECTED -> TYPE_WIFI
-
-            networkInfo.type == ConnectivityManager.TYPE_MOBILE &&
-                    networkInfo.state == NetworkInfo.State.CONNECTED -> TYPE_MOBILE
-
+        return when (networkInfo.type) {
+            ConnectivityManager.TYPE_WIFI if networkInfo.state == NetworkInfo.State.CONNECTED -> TYPE_WIFI
+            ConnectivityManager.TYPE_MOBILE if networkInfo.state == NetworkInfo.State.CONNECTED -> TYPE_MOBILE
             else -> TYPE_NOT_CONNECTED
         }
     }
