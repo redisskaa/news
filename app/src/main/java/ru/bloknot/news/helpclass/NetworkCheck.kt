@@ -3,36 +3,23 @@ package ru.bloknot.news.helpclass
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
+import android.net.NetworkCapabilities
 
 object NetworkCheck {
 
-    private const val TYPE_WIFI = 1
-    private const val TYPE_MOBILE = 2
-    private const val TYPE_NOT_CONNECTED = 0
-
-    // TODO: NetworkInfo и getActiveNetworkInfo() deprecated с API 29.
-    //  Заменить на ConnectivityManager.NetworkCallback — отдельным коммитом после миграции.
-
-    @JvmStatic
-    fun getConnectivityStatus(context: Context): Int {
-        val connectivityManager = context
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
-            ?: return TYPE_NOT_CONNECTED
-
-        val networkInfo: NetworkInfo = connectivityManager.activeNetworkInfo
-            ?: return TYPE_NOT_CONNECTED
-
-        return when (networkInfo.type) {
-            ConnectivityManager.TYPE_WIFI if networkInfo.state == NetworkInfo.State.CONNECTED -> TYPE_WIFI
-            ConnectivityManager.TYPE_MOBILE if networkInfo.state == NetworkInfo.State.CONNECTED -> TYPE_MOBILE
-            else -> TYPE_NOT_CONNECTED
-        }
-    }
-
+    /**
+     * true, если есть активная сеть с доступом в интернет.
+     *
+     * Использует NetworkCapabilities (API 23+) вместо устаревшего NetworkInfo (deprecated с API 29).
+     * NET_CAPABILITY_VALIDATED отсекает Wi-Fi без выхода в интернет
+     * (подключён к роутеру, но интернета нет).
+     */
     @JvmStatic
     fun isNetworkConnected(context: Context): Boolean {
-        val status = getConnectivityStatus(context)
-        return status == TYPE_WIFI || status == TYPE_MOBILE
+        val cm = context.getSystemService(ConnectivityManager::class.java) ?: return false
+        val network = cm.activeNetwork ?: return false
+        val caps = cm.getNetworkCapabilities(network) ?: return false
+        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }
