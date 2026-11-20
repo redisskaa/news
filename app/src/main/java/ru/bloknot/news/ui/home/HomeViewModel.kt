@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
+import ru.bloknot.news.helpclass.NetworkCheck
 import ru.bloknot.news.models.CardNews
 import ru.bloknot.news.utils.Constants
 import java.util.concurrent.TimeUnit
@@ -36,6 +37,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun loadNews() {
         _uiState.value = HomeUiState.Loading
         viewModelScope.launch {
+            if (!NetworkCheck.isNetworkConnected(getApplication())) {
+                _uiState.value = HomeUiState.Error("Нет подключения к интернету. Проверьте настройки сети.")
+                return@launch
+            }
             try {
                 Log.e("HOME_VM", "Запуск загрузки новостей")
                 val news = fetchAndParse()
@@ -43,7 +48,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.value = HomeUiState.Success(news)
             } catch (e: Exception) {
                 Log.e("HOME_VM", "КРИТИЧЕСКАЯ ОШИБКА", e)
-                _uiState.value = HomeUiState.Error("Ошибка: ${e.message ?: "неизвестно"}")
+                _uiState.value = HomeUiState.Error("Не удалось загрузить новости. Попробуйте позже.")
             }
         }
     }
