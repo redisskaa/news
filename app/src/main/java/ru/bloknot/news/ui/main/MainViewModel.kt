@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,6 +54,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 Log.e(TAG, "loadNews error: $url", e)
                 _uiState.value = MainUiState.Error("Ошибка загрузки: ${e.message ?: "неизвестно"}")
+                FirebaseCrashlytics.getInstance().log("Пустой парсинг: url=$url, category=$category")
+                FirebaseCrashlytics.getInstance().recordException(
+                    RuntimeException("Парсер вернул 0 новостей для $url")
+                )
             }
         }
     }

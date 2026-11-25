@@ -22,10 +22,9 @@
 
     <ProgressBar
         android:id="@+id/progBarMain"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:visibility="gone"
-        android:padding="150dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
 </LinearLayout>

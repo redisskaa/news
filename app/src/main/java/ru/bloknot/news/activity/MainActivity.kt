@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Стартуем MainActivity")
 
         recyclerView = findViewById(R.id.recycler)
-        customAdapter = CustomAdapter(emptyList())
+        customAdapter = CustomAdapter()
         recyclerView.adapter = customAdapter
         setupRecyclerClickListener()
 
@@ -78,21 +78,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         observeUiState()
-        viewModel.loadNews(urls[pos], category)
+
+        // Стало:
+        val url = urls.getOrNull(pos) ?: run {
+            Toast.makeText(this, "Ошибка: категория не найдена", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        viewModel.loadNews(url, category)
     }
 
     private fun observeUiState() {
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 when (state) {
-                    is MainUiState.Loading -> Log.d(TAG, "Loading...")
+                    is MainUiState.Loading -> {
+                        binding.progBarMain.visibility = View.VISIBLE
+                        binding.recycler.visibility = View.GONE
+                    }
                     is MainUiState.Success -> {
+                        binding.progBarMain.visibility = View.GONE
+                        binding.recycler.visibility = View.VISIBLE
                         currentNews = state.news
                         listFullUrls = state.urls
-                        customAdapter = CustomAdapter(state.news)
-                        recyclerView.adapter = customAdapter
+                        customAdapter.updateNews(state.news)
                     }
                     is MainUiState.Error -> {
+                        binding.progBarMain.visibility = View.GONE
                         Toast.makeText(this@MainActivity, state.message, Toast.LENGTH_SHORT).show()
                         if (state.noInternet) finish()
                     }

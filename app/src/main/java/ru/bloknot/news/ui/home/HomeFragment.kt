@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import ru.bloknot.news.adapters.CustomAdapter
 import ru.bloknot.news.databinding.FragmentHomeBinding
-import ru.bloknot.news.models.CardNews
 
 class HomeFragment : Fragment() {
 
@@ -34,16 +33,14 @@ class HomeFragment : Fragment() {
         Log.d("Starting", "Стартуем HomeFragment")
         setupRecyclerView()
         observeUiState()
-        viewModel.loadNews()
 
-        // Pull-to-refresh
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadNews()
         }
     }
 
     private fun setupRecyclerView() {
-        adapter = CustomAdapter(mutableListOf())
+        adapter = CustomAdapter()
         binding.recyclerHome.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = this@HomeFragment.adapter
@@ -61,9 +58,7 @@ class HomeFragment : Fragment() {
                     is HomeUiState.Success -> {
                         binding.progBarMain.visibility = View.GONE
                         binding.swipeRefresh.isRefreshing = false
-
-                        // ←←←←←←←←←← ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ! ←←←←←←←←←←
-                        binding.recyclerHome.adapter = CustomAdapter(state.news as MutableList<CardNews>)
+                        adapter.updateNews(state.news)
                     }
 
                     is HomeUiState.Error -> {
@@ -72,9 +67,7 @@ class HomeFragment : Fragment() {
                         Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
                     }
 
-                    else -> {
-                        println("Что то не так")
-                    }
+                    else -> Unit
                 }
             }
         }
